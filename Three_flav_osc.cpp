@@ -10,6 +10,7 @@ using namespace std;
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_eigen.h>
 #include <gsl/gsl_vector.h>
+#include <gsl/gsl_linalg.h>
 /* This program should be compiled as:
 g++ -o oscillations Three_flav_osc.cpp `gsl-config --cflags --libs`
 */
@@ -94,8 +95,15 @@ cout << "CKM matrix inverted (transposed)..." << endl;
 
 //Build perturbation in flavor basis
 gsl_matrix *V_f = gsl_matrix_alloc(3, 3);
-gsl_matrix_set_zero(V_f);
 gsl_matrix_set (V_f, 0, 0, 1.0); 
+gsl_matrix_set (V_f, 0, 1, 0); 
+gsl_matrix_set (V_f, 0, 2, 0); 
+gsl_matrix_set (V_f, 1, 0, 0); 
+gsl_matrix_set (V_f, 1, 1, 0); 
+gsl_matrix_set (V_f, 1, 2, 0); 
+gsl_matrix_set (V_f, 2, 0, 0); 
+gsl_matrix_set (V_f, 2, 1, 0); 
+gsl_matrix_set (V_f, 2, 2, 0); 
 //Build perturbation in mass basis
 //V_m=U^-1 V_f U
 
@@ -103,36 +111,53 @@ gsl_matrix *V_m = gsl_matrix_alloc(3, 3);
 gsl_matrix *first = gsl_matrix_alloc(3, 3);
 gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, ICKM, V_f, 0.0, first);
 gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, first, CKM, 0.0, V_m); 
+
 gsl_matrix_free(first);
 
 //Matter density A
-A=(1/sqrt(2))*G_f*(1/(m_N*pow(10, -3)))*density(L);
+A=(1/sqrt(2))*G_f*(1/(m_N*1E-3))*density(L);
 gsl_matrix_scale(V_m, A);
 cout << "The matter density is " << A << endl;
+
 //Build matrix T
 gsl_matrix *T = gsl_matrix_alloc(3, 3);
 gsl_matrix *traceHm = gsl_matrix_alloc(3, 3);
 //Matrix traceHm is defined as H_m - 1/3trH_m.
-gsl_matrix_set_zero(traceHm);
 gsl_matrix_set(traceHm, 0, 0, (1/3)*(E12+E13-A));
+gsl_matrix_set(traceHm, 0, 1, 0);
+gsl_matrix_set(traceHm, 0, 2, 0);
+gsl_matrix_set(traceHm, 1, 0, 0);
 gsl_matrix_set(traceHm, 1, 1, (1/3)*(E21+E23-A));
+gsl_matrix_set(traceHm, 1, 2, 0);
+gsl_matrix_set(traceHm, 2, 0, 0);
+gsl_matrix_set(traceHm, 2, 1, 0);
 gsl_matrix_set(traceHm, 2, 2, (1/3)*(E31+E32-A));
+
 gsl_matrix_add(V_m, traceHm);
 gsl_matrix *otherT = gsl_matrix_alloc(3, 3);
 gsl_matrix_memcpy(V_m, T);
 gsl_matrix_memcpy(V_m, otherT);
+
 gsl_matrix_free(V_m);
 gsl_matrix_free(traceHm);
-//Calculate the eigenvalues of T
-gsl_eigen_nonsymm_workspace *w = gsl_eigen_nonsymm_alloc(3);
 
-gsl_vector_complex *eigval = gsl_vector_complex_alloc(3);
-gsl_eigen_nonsymm(otherT, eigval, w);
-for (int i = 0; i<3;i++){
-	gsl_complex eval_i = gsl_vector_complex_get (eigval, i);
-	double eival_i=gsl_complex_abs(eval_i);
-	cout << "lambda " << eival_i << endl;
-}
+cout.precision(30);
+cout << gsl_matrix_fprintf(stdout, T, "%f");
+
+//Calculate the eigenvalues of T
+//Calculate c_i
+//c_0 = -detT
+
+gsl_permutation *p = gsl_permutation_alloc(3);
+int signum;
+gsl_linalg_LU_decomp(otherT, p, &signum);
+
+//cout << gsl_matrix_fprintf(stdout, otherT, "%g");
+
+double c_0 = gsl_linalg_LU_det(otherT, signum);
+cout << "c_0= " << c_0 << endl;
+
+
 
 t2=clock();
 float diff ((float)t2-(float)t1);
