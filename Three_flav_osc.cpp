@@ -115,7 +115,7 @@ gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, first, CKM, 0.0, V_m);
 gsl_matrix_free(first);
 
 //Matter density A
-A=(1/sqrt(2))*G_f*(1/(m_N*1E-3))*density(L);
+A=1.0;//(1/sqrt(2))*G_f*(1/(m_N*1E-3))*density(L);
 gsl_matrix_scale(V_m, A);
 cout << "The matter density is " << A << endl;
 
@@ -138,11 +138,11 @@ gsl_matrix *otherT = gsl_matrix_alloc(3, 3);
 gsl_matrix_memcpy(V_m, T);
 gsl_matrix_memcpy(V_m, otherT);
 
-gsl_matrix_free(V_m);
-gsl_matrix_free(traceHm);
+//gsl_matrix_free(V_m);
+//gsl_matrix_free(traceHm);
 
 cout.precision(30);
-cout << gsl_matrix_fprintf(stdout, T, "%f");
+cout << gsl_matrix_fprintf(stdout, V_m, "%f");
 
 //Calculate the eigenvalues of T
 //Calculate c_i
