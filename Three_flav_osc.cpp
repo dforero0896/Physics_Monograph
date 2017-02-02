@@ -23,8 +23,8 @@ double m_N=939.57 ; //MeV
 double Ue1, Ue2, Ue3, Umu1, Umu2, Umu3, Ut1, Ut2, Ut3;
 double E12, E13, E21, E23, E31, E32;
 //Define squared mass differences.
-double dM32 = 3.2 * pow(10, -3); //eV^2
-double dm21 = 0; //eV^2
+double dM32 = 3.2E-3; //eV^2
+double dm21 = 0.0; //eV^2
 
 //Define vacuum mixing angles.
 int theta1 = 45; //Degrees
@@ -36,16 +36,28 @@ double delta = 0;
 //Distance
 float L=1;
 
+//Calculate energy differences.
+double energies ( double massq, double neut_energy);
+
+
+//Density profile.
+double density( double lon);
+
+
+
 
 int main(){
 clock_t t1,t2;
 t1=clock();
+E21=energies( dm21, 1E9);
+E32=energies( dM32, 1e9);
 
 E12=-E21;
 E23=-E32;
 E31=-E12-E23;
 E13=-E31;
-double density( double lon);
+
+
 //Calculate matrix elements.
 Ue1 = gsl_sf_cos(theta2)*gsl_sf_cos(theta3);
 Ue2 = gsl_sf_sin(theta3)*gsl_sf_cos(theta2);
@@ -133,6 +145,10 @@ gsl_matrix_set(traceHm, 2, 0, 0);
 gsl_matrix_set(traceHm, 2, 1, 0);
 gsl_matrix_set(traceHm, 2, 2, (1/3)*(E31+E32-A));
 
+cout.precision(30);
+cout << gsl_matrix_fprintf(stdout, first, "%f");
+
+
 gsl_matrix_add(V_m, traceHm);
 gsl_matrix *otherT = gsl_matrix_alloc(3, 3);
 gsl_matrix_memcpy(V_m, T);
@@ -141,8 +157,6 @@ gsl_matrix_memcpy(V_m, otherT);
 //gsl_matrix_free(V_m);
 //gsl_matrix_free(traceHm);
 
-cout.precision(30);
-cout << gsl_matrix_fprintf(stdout, V_m, "%f");
 
 //Calculate the eigenvalues of T
 //Calculate c_i
