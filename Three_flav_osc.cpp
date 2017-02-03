@@ -156,14 +156,53 @@ cout << GSL_REAL(lam2) << endl;
 cout << "Eigenvalues calculated..." << endl;
 
 //Build operator.
+ double origT[] = { gsl_matrix_get(T,0,0), gsl_matrix_get(T,0,1), gsl_matrix_get(T,0,2),
+                 gsl_matrix_get(T,1,0), gsl_matrix_get(T,1,1), gsl_matrix_get(T,1,2),
+		gsl_matrix_get(T,2,0), gsl_matrix_get(T,2,1), gsl_matrix_get(T,2,2) };
+
+  double arrICKM[]  = { gsl_matrix_get(ICKM,0,0), gsl_matrix_get(ICKM,0,1), gsl_matrix_get(ICKM,0,2),
+                 gsl_matrix_get(ICKM,1,0), gsl_matrix_get(ICKM,1,1), gsl_matrix_get(ICKM,1,2),
+		gsl_matrix_get(ICKM,2,0), gsl_matrix_get(ICKM,2,1), gsl_matrix_get(ICKM,2,2) };
+  
+double interm[] = { 0.00, 0.00, 0.00,
+                 0.00, 0.00,0.00,
+		0.00, 0.00, 0.00 };
+
+
+  gsl_matrix_view invCKM = gsl_matrix_view_array(origT, 3, 3);
+  gsl_matrix_view orT = gsl_matrix_view_array(arrICKM, 3, 3);
+  gsl_matrix_view Interm = gsl_matrix_view_array(interm, 3, 3);
+
+ gsl_blas_dgemm (CblasNoTrans, CblasNoTrans,
+                  1.0, &invCKM.matrix, &orT.matrix,
+                  0.0, &Interm.matrix);
+
+double arrCKM[] ={ gsl_matrix_get(CKM,0,0), gsl_matrix_get(CKM,0,1), gsl_matrix_get(CKM,0,2),
+                 gsl_matrix_get(CKM,1,0), gsl_matrix_get(CKM,1,1), gsl_matrix_get(CKM,1,2),
+		gsl_matrix_get(CKM,2,0), gsl_matrix_get(CKM,2,1), gsl_matrix_get(CKM,2,2) };
+
+double T_h[] = { 0.00, 0.00, 0.00,
+                 0.00, 0.00,0.00,
+		0.00, 0.00, 0.00 };
+
+  gsl_matrix_view newInterm= gsl_matrix_view_array(interm, 3, 3);
+  gsl_matrix_view noinvCKM = gsl_matrix_view_array(arrCKM, 3, 3);
+  gsl_matrix_view T_hat = gsl_matrix_view_array(T_h, 3, 3);
+
+ gsl_blas_dgemm (CblasNoTrans, CblasNoTrans,
+                  1.0, &Interm.matrix, &noinvCKM.matrix,
+                  0.0, &T_hat.matrix);
+cout << interm[6] << endl;
+
 /*
 gsl_matrix *That = gsl_matrix_alloc(3, 3);
 gsl_matrix *first = gsl_matrix_alloc(3, 3);
 gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, ICKM, T, 0.0, first);
 gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, first, CKM, 0.0, That); 
 
+
 cout.precision(30);
-cout << gsl_matrix_fprintf(stdout, T, "%f");
+cout << gsl_matrix_fprintf(stdout, T_hat.matrix, "%f");
 */
 
 t2=clock();
