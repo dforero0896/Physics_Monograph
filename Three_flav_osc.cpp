@@ -105,73 +105,66 @@ gsl_matrix_transpose_memcpy(ICKM, CKM);
 cout << "CKM matrix inverted (transposed)..." << endl;
 
 
-//Build perturbation in flavor basis
-gsl_matrix *V_f = gsl_matrix_alloc(3, 3);
-gsl_matrix_set (V_f, 0, 0, 1.0); 
-gsl_matrix_set (V_f, 0, 1, 0); 
-gsl_matrix_set (V_f, 0, 2, 0); 
-gsl_matrix_set (V_f, 1, 0, 0); 
-gsl_matrix_set (V_f, 1, 1, 0); 
-gsl_matrix_set (V_f, 1, 2, 0); 
-gsl_matrix_set (V_f, 2, 0, 0); 
-gsl_matrix_set (V_f, 2, 1, 0); 
-gsl_matrix_set (V_f, 2, 2, 0); 
-//Build perturbation in mass basis
-//V_m=U^-1 V_f U
-
-gsl_matrix *V_m = gsl_matrix_alloc(3, 3);
-gsl_matrix *first = gsl_matrix_alloc(3, 3);
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, ICKM, V_f, 0.0, first);
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, first, CKM, 0.0, V_m); 
-
-gsl_matrix_free(first);
 
 //Matter density A
-A=1.0;//(1/sqrt(2))*G_f*(1/(m_N*1E-3))*density(L);
-gsl_matrix_scale(V_m, A);
+A=1E-13;//(1/sqrt(2))*G_f*(1/(m_N*1E-3))*density(L);
+
 cout << "The matter density is " << A << endl;
 
 //Build matrix T
 gsl_matrix *T = gsl_matrix_alloc(3, 3);
-gsl_matrix *traceHm = gsl_matrix_alloc(3, 3);
+
 //Matrix traceHm is defined as H_m - 1/3trH_m.
-gsl_matrix_set(traceHm, 0, 0, (1/3)*(E12+E13-A));
-gsl_matrix_set(traceHm, 0, 1, 0);
-gsl_matrix_set(traceHm, 0, 2, 0);
-gsl_matrix_set(traceHm, 1, 0, 0);
-gsl_matrix_set(traceHm, 1, 1, (1/3)*(E21+E23-A));
-gsl_matrix_set(traceHm, 1, 2, 0);
-gsl_matrix_set(traceHm, 2, 0, 0);
-gsl_matrix_set(traceHm, 2, 1, 0);
-gsl_matrix_set(traceHm, 2, 2, (1/3)*(E31+E32-A));
+gsl_matrix_set(T, 0, 0, A*pow(Ue1,2)+(1./3)*(E12+E13-A));
+gsl_matrix_set(T, 0, 1, A*Ue1*Ue2);
+gsl_matrix_set(T, 0, 2, A*Ue1*Ue3);
+gsl_matrix_set(T, 1, 0, A*Ue1*Ue2);
+gsl_matrix_set(T, 1, 1, A*pow(Ue2,2)+(1./3)*(E21+E23-A));
+gsl_matrix_set(T, 1, 2, A*Ue2*Ue3);
+gsl_matrix_set(T, 2, 0, A*Ue1*Ue3);
+gsl_matrix_set(T, 2, 1, A*Ue2*Ue3);
+gsl_matrix_set(T, 2, 2, A*pow(Ue3,2)+(1./3)*(E31+E32-A));
+cout << "Matrix T calculated..." << endl;
+
+
+//Calculate c0.
+long double c0=gsl_matrix_get(T,0, 0)*gsl_matrix_get(T,1, 1)*gsl_matrix_get(T,2, 2)-gsl_matrix_get(T,0,0)*gsl_matrix_get(T,1,2)*gsl_matrix_get(T,2,1)-gsl_matrix_get(T,0,1)*gsl_matrix_get(T,1,0)*gsl_matrix_get(T,2,2)+gsl_matrix_get(T,0,1)*gsl_matrix_get(T,2,0)*gsl_matrix_get(T,1,2)+gsl_matrix_get(T,0,2)*gsl_matrix_get(T,1,0)*gsl_matrix_get(T,2,1)-gsl_matrix_get(T,0,2)*gsl_matrix_get(T,2,0)*gsl_matrix_get(T,1,1);
+c0 *= -1.;
+
+
+
+//Calculate c1.
+long double c1=gsl_matrix_get(T,0,0)*gsl_matrix_get(T,1,1)+gsl_matrix_get(T,0,0)*gsl_matrix_get(T,2,2)+gsl_matrix_get(T,1,1)*gsl_matrix_get(T,2,2)-gsl_matrix_get(T,1,2)*gsl_matrix_get(T,2,1)-gsl_matrix_get(T,0,1)*gsl_matrix_get(T,1,0)-gsl_matrix_get(T,0,2)*gsl_matrix_get(T,2,0);
+
+cout << "Constants c_i calculated..." << endl;
+
+//Calculate eigenvalues.
+gsl_complex atanArg = gsl_complex_rect((1./c0)*sqrt(-pow(c0, 2)-(4./27.)*pow(c1, 3)), 0);
+gsl_complex atanVal=gsl_complex_mul_real(gsl_complex_arctan(atanArg), 1./3.);
+gsl_complex half = gsl_complex_rect(2*sqrt((-1./3.)*c1), 0);
+gsl_complex s1Ps2 = gsl_complex_mul(half, gsl_complex_cos(atanVal));
+gsl_complex dummy_s1Ms2 = gsl_complex_mul(half, gsl_complex_sin(atanVal));
+gsl_complex s1Ms2 = gsl_complex_mul(dummy_s1Ms2, gsl_complex_rect(0., 1.));
+
+gsl_complex lam1 = gsl_complex_add(gsl_complex_mul_real(s1Ps2, -1./2.), gsl_complex_mul_real(gsl_complex_mul(gsl_complex_rect(0., 1.), s1Ms2), sqrt(3.)/2.));
+
+gsl_complex lam2 = gsl_complex_sub(gsl_complex_mul_real(s1Ps2, -1./2.), gsl_complex_mul_real(gsl_complex_mul(gsl_complex_rect(0., 1.), s1Ms2), sqrt(3.)/2.));
+
+gsl_complex lam3 = s1Ps2;
+
+cout << GSL_REAL(lam2) << endl;
+cout << "Eigenvalues calculated..." << endl;
+
+//Build operator.
+/*
+gsl_matrix *That = gsl_matrix_alloc(3, 3);
+gsl_matrix *first = gsl_matrix_alloc(3, 3);
+gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, ICKM, T, 0.0, first);
+gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, first, CKM, 0.0, That); 
 
 cout.precision(30);
-cout << gsl_matrix_fprintf(stdout, first, "%f");
-
-
-gsl_matrix_add(V_m, traceHm);
-gsl_matrix *otherT = gsl_matrix_alloc(3, 3);
-gsl_matrix_memcpy(V_m, T);
-gsl_matrix_memcpy(V_m, otherT);
-
-//gsl_matrix_free(V_m);
-//gsl_matrix_free(traceHm);
-
-
-//Calculate the eigenvalues of T
-//Calculate c_i
-//c_0 = -detT
-
-gsl_permutation *p = gsl_permutation_alloc(3);
-int signum;
-gsl_linalg_LU_decomp(otherT, p, &signum);
-
-//cout << gsl_matrix_fprintf(stdout, otherT, "%g");
-
-double c_0 = gsl_linalg_LU_det(otherT, signum);
-cout << "c_0= " << c_0 << endl;
-
-
+cout << gsl_matrix_fprintf(stdout, T, "%f");
+*/
 
 t2=clock();
 float diff ((float)t2-(float)t1);
