@@ -15,7 +15,7 @@ using namespace std;
 g++ -o oscillations Three_flav_osc.cpp `gsl-config --cflags --libs`
 */
 //Fermi coupling constant
-long double G_f=1.16637*pow(10, -5); //GeV^-2
+long double G_f=1.16637E-5; //GeV^-2
 long double A;
 double m_N=939.57 ; //MeV
 
@@ -43,7 +43,8 @@ double energies ( double massq, double neut_energy);
 //Density profile.
 double density( double lon);
 
-
+//Eigenvalues
+gsl_complex lam1, lam2, lam3;
 
 
 int main(){
@@ -114,7 +115,6 @@ cout << "The matter density is " << A << endl;
 //Build matrix T
 gsl_matrix *T = gsl_matrix_alloc(3, 3);
 
-//Matrix traceHm is defined as H_m - 1/3trH_m.
 gsl_matrix_set(T, 0, 0, A*pow(Ue1,2)+(1./3)*(E12+E13-A));
 gsl_matrix_set(T, 0, 1, A*Ue1*Ue2);
 gsl_matrix_set(T, 0, 2, A*Ue1*Ue3);
@@ -125,7 +125,6 @@ gsl_matrix_set(T, 2, 0, A*Ue1*Ue3);
 gsl_matrix_set(T, 2, 1, A*Ue2*Ue3);
 gsl_matrix_set(T, 2, 2, A*pow(Ue3,2)+(1./3)*(E31+E32-A));
 cout << "Matrix T calculated..." << endl;
-
 
 //Calculate c0.
 long double c0=gsl_matrix_get(T,0, 0)*gsl_matrix_get(T,1, 1)*gsl_matrix_get(T,2, 2)-gsl_matrix_get(T,0,0)*gsl_matrix_get(T,1,2)*gsl_matrix_get(T,2,1)-gsl_matrix_get(T,0,1)*gsl_matrix_get(T,1,0)*gsl_matrix_get(T,2,2)+gsl_matrix_get(T,0,1)*gsl_matrix_get(T,2,0)*gsl_matrix_get(T,1,2)+gsl_matrix_get(T,0,2)*gsl_matrix_get(T,1,0)*gsl_matrix_get(T,2,1)-gsl_matrix_get(T,0,2)*gsl_matrix_get(T,2,0)*gsl_matrix_get(T,1,1);
@@ -154,45 +153,26 @@ gsl_complex lam3 = s1Ps2;
 
 cout << GSL_REAL(lam2) << endl;
 cout << "Eigenvalues calculated..." << endl;
+// /*
+//Build matrix T**2
+gsl_matrix *Tsq = gsl_matrix_alloc(3, 3);
+gsl_matrix_set(Tsq, 0, 0,(1./3.)*(pow(A, 2)*(pow(Ue1, 2) + (1./3.)) + 2.*A*(pow(Ue1, 2)-(1./3.))*(E12+E13)+(1./3.)*pow((E12+E13), 2)));
+gsl_matrix_set(Tsq, 0, 1, (1./3.)*Ue1*Ue2*A*(A+E13+E23));
+gsl_matrix_set(Tsq, 0, 2, (1./3.)*Ue1*Ue3*A*(A+E12+E32));
+gsl_matrix_set(Tsq, 1, 0, (1./3.)*Ue1*Ue2*A*(A+E13+E23));
+gsl_matrix_set(Tsq, 1, 1, (1./3.)*(pow(A, 2)*(pow(Ue2, 2) + (1./3.)) + 2.*A*(pow(Ue2, 2)-(1./3.))*(E21+E23)+(1./3.)*pow((E21+E23), 2)));
+gsl_matrix_set(Tsq, 1, 2, (1./3.)*Ue2*Ue3*A*(A+E21+E31));
+gsl_matrix_set(Tsq, 2, 0, (1./3.)*Ue1*Ue3*A*(A+E12+E32));
+gsl_matrix_set(Tsq, 2, 1, (1./3.)*Ue2*Ue3*A*(A+E21+E31));
+gsl_matrix_set(Tsq, 2, 2, (1./3.)*(pow(A, 2)*(pow(Ue3, 2) + (1./3.)) + 2.*A*(pow(Ue3, 2)-(1./3.))*(E31+E32)+(1./3.)*pow((E31+E32), 2)));
 
+
+
+cout << gsl_matrix_get(Tsq, 0, 2) << endl;
+cout << "Matrix T**2 calculated..." << endl;
+//*/
 //Build operator.
- double origT[] = { gsl_matrix_get(T,0,0), gsl_matrix_get(T,0,1), gsl_matrix_get(T,0,2),
-                 gsl_matrix_get(T,1,0), gsl_matrix_get(T,1,1), gsl_matrix_get(T,1,2),
-		gsl_matrix_get(T,2,0), gsl_matrix_get(T,2,1), gsl_matrix_get(T,2,2) };
 
-  double arrICKM[]  = { gsl_matrix_get(ICKM,0,0), gsl_matrix_get(ICKM,0,1), gsl_matrix_get(ICKM,0,2),
-                 gsl_matrix_get(ICKM,1,0), gsl_matrix_get(ICKM,1,1), gsl_matrix_get(ICKM,1,2),
-		gsl_matrix_get(ICKM,2,0), gsl_matrix_get(ICKM,2,1), gsl_matrix_get(ICKM,2,2) };
-  
-double interm[] = { 0.00, 0.00, 0.00,
-                 0.00, 0.00,0.00,
-		0.00, 0.00, 0.00 };
-
-
-  gsl_matrix_view invCKM = gsl_matrix_view_array(origT, 3, 3);
-  gsl_matrix_view orT = gsl_matrix_view_array(arrICKM, 3, 3);
-  gsl_matrix_view Interm = gsl_matrix_view_array(interm, 3, 3);
-
- gsl_blas_dgemm (CblasNoTrans, CblasNoTrans,
-                  1.0, &invCKM.matrix, &orT.matrix,
-                  0.0, &Interm.matrix);
-
-double arrCKM[] ={ gsl_matrix_get(CKM,0,0), gsl_matrix_get(CKM,0,1), gsl_matrix_get(CKM,0,2),
-                 gsl_matrix_get(CKM,1,0), gsl_matrix_get(CKM,1,1), gsl_matrix_get(CKM,1,2),
-		gsl_matrix_get(CKM,2,0), gsl_matrix_get(CKM,2,1), gsl_matrix_get(CKM,2,2) };
-
-double T_h[] = { 0.00, 0.00, 0.00,
-                 0.00, 0.00,0.00,
-		0.00, 0.00, 0.00 };
-
-  gsl_matrix_view newInterm= gsl_matrix_view_array(interm, 3, 3);
-  gsl_matrix_view noinvCKM = gsl_matrix_view_array(arrCKM, 3, 3);
-  gsl_matrix_view T_hat = gsl_matrix_view_array(T_h, 3, 3);
-
- gsl_blas_dgemm (CblasNoTrans, CblasNoTrans,
-                  1.0, &Interm.matrix, &noinvCKM.matrix,
-                  0.0, &T_hat.matrix);
-cout << interm[6] << endl;
 
 /*
 gsl_matrix *That = gsl_matrix_alloc(3, 3);
