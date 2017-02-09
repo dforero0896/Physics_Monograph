@@ -46,7 +46,10 @@ double density( double lon);
 //Eigenvalues
 gsl_complex lam1, lam2, lam3;
 
+//Matrices.
+gsl_matrix CKM;
 
+void toFlavor(const gsl_matrix* toTransform, gsl_matrix *destiny, const gsl_matrix *CKM);
 int main(){
 clock_t t1,t2;
 t1=clock();
@@ -170,6 +173,21 @@ gsl_matrix_set(Tsq, 2, 2, (1./3.)*(pow(A, 2)*(pow(Ue3, 2) + (1./3.)) + 2.*A*(pow
 
 cout << gsl_matrix_get(Tsq, 0, 2) << endl;
 cout << "Matrix T**2 calculated..." << endl;
+
+//Transform matrices to flavor basis
+gsl_matrix *TFsq = gsl_matrix_alloc(3, 3);
+toFlavor(Tsq, TFsq, CKM);
+gsl_matrix *TF = gsl_matrix_alloc(3, 3);
+toFlavor(T, TF, CKM);
+int i, k;
+for ( i =0;i<3; i++){
+for ( k=0; k<3; k++){
+cout.precision(30);
+cout << gsl_matrix_get(TFsq, i, k)<< endl;
+
+}
+}
+cout << "T and T**2 have been converted to flavor basis..." <<endl;
 //*/
 //Build operator.
 
@@ -203,4 +221,21 @@ double energies ( double massq, double neut_energy){
 
 double Eij = massq/(2*neut_energy);
 return Eij;
+}
+
+void toFlavor (const gsl_matrix *toTransform, gsl_matrix *destiny, const gsl_matrix *CKM){
+int alpha, beta, a, b;
+long double sum;
+for (alpha=0;alpha<3;alpha++){
+	for (beta=0;beta<3; beta++){
+sum=0.;
+		for (a=0;a<3;a++){
+			for (b=0;b<3;b++){
+sum += gsl_matrix_get(CKM, alpha, a)*gsl_matrix_get(CKM, beta, b)*gsl_matrix_get(toTransform, a, b);
+
+			}
+		}
+gsl_matrix_set(destiny, alpha, beta, sum);
+	}
+}
 }
