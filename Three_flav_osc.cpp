@@ -58,7 +58,7 @@ void scaleToOther(gsl_matrix *toScale, double scaleFactor, gsl_matrix *result);
 
 gsl_complex real2comp(double real);
 
-void sumTerms(int index, gsl_matrix *result);
+void sumTerms(int index, gsl_matrix *result, gsl_matrix *term3, gsl_matrix *term2, gsl_matrix *term1, gsl_matrix *sum);
 void addMatrices(gsl_matrix *mat1, gsl_matrix *mat2, gsl_matrix *mat3,gsl_matrix *result);
 long double c0, c1;
 
@@ -196,10 +196,27 @@ eigenVals[1]=GSL_REAL(lam2);
 eigenVals[2]=GSL_REAL(lam3);
 
 gsl_matrix *opSum= gsl_matrix_alloc(3,3);
+gsl_matrix *term1= gsl_matrix_alloc(3,3);
+gsl_matrix *term2= gsl_matrix_alloc(3,3);
+gsl_matrix *sum= gsl_matrix_alloc(3,3);
 
-sumTerms(0, opSum);
+scaleToOther(TF, eigenVals[0], term2);
+
+scaleToOther(Itty, pow(eigenVals[0], 2) + c1, term1);
 
 
+
+addMatrices(term1, term2, TFsq, sum);
+
+
+int a, b;
+for(a=0;a<3;a++){
+for(b=0;b<3;b++){
+cout << gsl_matrix_get(sum, a, b) << endl;
+
+}
+
+}
 
 
 t2=clock();
@@ -260,14 +277,14 @@ void scaleToOther(gsl_matrix *toScale, double scaleFactor, gsl_matrix *result){
 int i, k;
 for (i=0;i<3;i++){
 for (k=0;k<3;k++){
-cout << "hasta aca sirve" << endl;
-double element=scaleFactor*gsl_matrix_get(toScale, i, k);
-gsl_matrix_set(result, i, k, element);
+long double matrixElem;
+matrixElem=scaleFactor*gsl_matrix_get(toScale, i, k);
+gsl_matrix_set(result, i, k, matrixElem);
+
+}
 }
 }
 
-
-}
 
 
 gsl_complex real2comp(double real){
@@ -286,22 +303,19 @@ gsl_matrix_set(result, i, k, gsl_matrix_get(mat1, i, k)+gsl_matrix_get(mat2, i, 
 
 }
 
-void sumTerms(int index, gsl_matrix *result){
-double extFactor = 1./(3*pow(eigenVals[index], 2) + c1);
+void sumTerms(int index, gsl_matrix *result, gsl_matrix *term3, gsl_matrix *term2, gsl_matrix *term1, gsl_matrix *sum){
+double extFactor = 1./(3*pow(eigenVals[0], 2) + c1);
 
-gsl_matrix *TFXlam = gsl_matrix_alloc(3, 3);
 
-scaleToOther(&TF, eigenVals[index], TFXlam);
+scaleToOther(&TF, eigenVals[0], term2);
 
-gsl_matrix *IdTerm = gsl_matrix_alloc(3, 3);
-scaleToOther(Itty, pow(eigenVals[index], 2) + c1, TFXlam);
+scaleToOther(Itty, pow(eigenVals[0], 2) + c1, term1);
 
-gsl_matrix *Interm = gsl_matrix_alloc(3, 3);
-gsl_matrix *firstSum = gsl_matrix_alloc(3, 3);
 
-addMatrices(IdTerm, TFXlam, &TFsq, Interm);
 
-scaleToOther(Interm, extFactor, result);
+addMatrices(term1, term2, term3, sum);
+
+scaleToOther(sum, extFactor, result);
 
 
 }
