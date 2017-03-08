@@ -13,6 +13,7 @@ using namespace std;
 #include <gsl/gsl_linalg.h>
 /* This program should be compiled as:
 g++ -o oscillations Three_flav_osc.cpp `gsl-config --cflags --libs`
+Or using the makefile attached.
 */
 //Fermi coupling constant
 long double G_f=1.16637E-5; //GeV^-2
@@ -200,15 +201,9 @@ gsl_matrix *term1= gsl_matrix_alloc(3,3);
 gsl_matrix *term2= gsl_matrix_alloc(3,3);
 gsl_matrix *sum= gsl_matrix_alloc(3,3);
 
-scaleToOther(TF, eigenVals[0], term2);
-
-scaleToOther(Itty, pow(eigenVals[0], 2) + c1, term1);
 
 
-
-addMatrices(term1, term2, TFsq, sum);
-
-
+ /*
 int a, b;
 for(a=0;a<3;a++){
 for(b=0;b<3;b++){
@@ -217,7 +212,8 @@ cout << gsl_matrix_get(sum, a, b) << endl;
 }
 
 }
-
+*/
+cout << gsl_matrix_get(term1, 1, 0)+gsl_matrix_get(term2, 1, 0)+gsl_matrix_get(TFsq, 1, 0)<< endl;
 
 t2=clock();
 float diff ((float)t2-(float)t1);
@@ -296,7 +292,10 @@ void addMatrices(gsl_matrix *mat1, gsl_matrix *mat2, gsl_matrix *mat3,gsl_matrix
 int i, k;
 for (i=0;i<3;i++){
 for (k=0;k<3;k++){
-gsl_matrix_set(result, i, k, gsl_matrix_get(mat1, i, k)+gsl_matrix_get(mat2, i, k)+gsl_matrix_get(mat3, i, k));
+double elem1 = gsl_matrix_get(mat1, i, k);
+double elem2 = gsl_matrix_get(mat2, i, k);
+double elem3 = gsl_matrix_get(mat3, i, k);
+gsl_matrix_set(result, i, k, elem1 + elem2 + elem3);
 }
 }
 
