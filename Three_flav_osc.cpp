@@ -62,6 +62,7 @@ gsl_complex real2comp(double real);
 void sumTerms(int index, gsl_matrix *result, gsl_matrix *term3, gsl_matrix *term2, gsl_matrix *term1, gsl_matrix *sum, double eigVal,  gsl_matrix *Tmat, gsl_matrix *TmatSQ);
 void addMatrices(gsl_matrix *mat1, gsl_matrix *mat2, gsl_matrix *mat3,gsl_matrix *result);
 long double c0, c1;
+void copyToComplexMat(gsl_matrix *initial, gsl_matrix_complex *result);
 
 
 int main(){
@@ -190,7 +191,7 @@ cout << "T and T**2 have been converted to flavor basis..." <<endl;
 
 //Build operator.
 
-gsl_complex phi = gsl_complex_polar(1., L*traceHm/3);
+gsl_complex phi = gsl_complex_polar(1., -L*traceHm/3);
 Ident(Itty);
 eigenVals[0]=GSL_REAL(lam1);
 eigenVals[1]=GSL_REAL(lam2);
@@ -222,14 +223,19 @@ gsl_matrix *resultt3= gsl_matrix_alloc(3,3);
 sumTerms(0, resultt3, term3_3, term2_3, term1_3, sum_3, eigenVals[2], TF, TFsq);
 
 
-gsl_matrix *FlavorOp = gsl_matrix_alloc(3, 3);
+
+
+gsl_matrix_complex *FlavorOp = gsl_matrix_complex_alloc(3, 3);
 gsl_matrix *theSum = gsl_matrix_alloc(3, 3);
 addMatrices(resultt, resultt2, resultt3, theSum);
+
+copyToComplexMat(theSum, FlavorOp);
+cout << "Operator in flavor basis ready!" << endl;
 
 int a, b;
 for(a=0;a<3;a++){
 for(b=0;b<3;b++){
-cout << gsl_matrix_get(resultt, a, b) << endl;
+cout << GSL_REAL(gsl_matrix_complex_get(FlavorOp, a, b)) <<"+i"<< GSL_IMAG(gsl_matrix_complex_get(FlavorOp, a, b))<< endl;
 
 }
 
@@ -239,7 +245,7 @@ cout << gsl_matrix_get(resultt, a, b) << endl;
 
 t2=clock();
 float diff ((float)t2-(float)t1);
-cout<<"Time elapsed " << diff << endl;
+cout<<"Time elapsed " << diff/CLOCKS_PER_SEC * 1E3 <<  "ms" << endl;
 
 
 return 0;
@@ -322,6 +328,9 @@ for (i=0;i<3;i++){
 }
 
 void sumTerms(int index, gsl_matrix *result, gsl_matrix *term3, gsl_matrix *term2, gsl_matrix *term1, gsl_matrix *sum, double eigVal,  gsl_matrix *Tmat, gsl_matrix *TmatSQ){
+
+
+gsl_complex compFac = gsl_complex_polar(1., -L*eigVal);
 double extFactor = 1./(3.*pow(eigVal, 2) + c1);
 scaleToOther(Tmat, eigVal, term2);
 scaleToOther(Itty, pow(eigVal, 2) + c1, term1);
@@ -331,5 +340,19 @@ gsl_matrix_free(term3);
 gsl_matrix_free(term2);
 gsl_matrix_free(term1);
 gsl_matrix_free(sum);
+
+
+}
+
+void copyToComplexMat(gsl_matrix *initial, gsl_matrix_complex *result){
+int i, k;
+gsl_complex elem;
+for (i=0;i<3;i++){
+	for (k=0;k<3;k++){
+elem =real2comp(gsl_matrix_get(initial, i, k));
+gsl_matrix_complex_set(result, i, k, elem);
+		}
+	}
+
 }
 
