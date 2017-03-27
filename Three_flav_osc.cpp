@@ -35,6 +35,7 @@ int theta3 = 45; //Degrees
 
 //Distance
 float L=1;
+double neutrinoEnergy;
 //Trace
 long double traceHm = 0;
 //Calculate energy differences.
@@ -61,16 +62,22 @@ gsl_complex real2comp(double real);
 
 void sumTerms(int index, gsl_matrix *result, gsl_matrix *term3, gsl_matrix *term2, gsl_matrix *term1, gsl_matrix *sum, double eigVal,  gsl_matrix *Tmat, gsl_matrix *TmatSQ);
 void addMatrices(gsl_matrix *mat1, gsl_matrix *mat2, gsl_matrix *mat3,gsl_matrix *result);
-long double c0, c1;
+void addComplexMatrices(gsl_matrix_complex *mat1, gsl_matrix_complex *mat2, gsl_matrix_complex *mat3,gsl_matrix_complex *result);
 void copyToComplexMat(gsl_matrix *initial, gsl_matrix_complex *result);
+void initializeMatrixZero(gsl_matrix *initial);
+long double c0, c1;
 
 
-int main(){
+
+int main(int argc, char* argv[]){
+
+neutrinoEnergy=1e9;
 clock_t t1,t2;
 t1=clock();
+
 //Energy differences.
-E21=energies( dm21, 1E9);
-E32=energies( dM32, 1e9);
+E21=energies(dm21, neutrinoEnergy);
+E32=energies(dM32, neutrinoEnergy);
 
 E12=-E21;
 E23=-E32;
@@ -202,46 +209,70 @@ gsl_matrix *term1_= gsl_matrix_alloc(3,3);
 gsl_matrix *term2_= gsl_matrix_alloc(3,3);
 gsl_matrix *term3_= gsl_matrix_alloc(3,3);
 gsl_matrix *sum_= gsl_matrix_alloc(3,3);
-gsl_matrix *resultt= gsl_matrix_alloc(3,3);
+gsl_matrix *projOp1= gsl_matrix_alloc(3,3);
+gsl_matrix_complex *Eig1Term = gsl_matrix_complex_alloc(3, 3);
+sumTerms(0, projOp1, term3_, term2_, term1_, sum_, eigenVals[0], TF, TFsq); //This is the P1
+copyToComplexMat(projOp1, Eig1Term); 
+gsl_matrix_complex_scale(Eig1Term, gsl_complex_polar(1, -L*eigenVals[0]));
 
-sumTerms(0, resultt, term3_, term2_, term1_, sum_, eigenVals[0], TF, TFsq);
-
- gsl_matrix *term1_2= gsl_matrix_alloc(3,3);
+gsl_matrix *term1_2= gsl_matrix_alloc(3,3);
 gsl_matrix *term2_2= gsl_matrix_alloc(3,3);
 gsl_matrix *term3_2= gsl_matrix_alloc(3,3);
 gsl_matrix *sum_2= gsl_matrix_alloc(3,3);
-gsl_matrix *resultt2= gsl_matrix_alloc(3,3);
-
-sumTerms(0, resultt2, term3_2, term2_2, term1_2, sum_2, eigenVals[1], TF, TFsq);
+gsl_matrix *projOp2= gsl_matrix_alloc(3,3);
+gsl_matrix_complex *Eig2Term = gsl_matrix_complex_alloc(3, 3);
+sumTerms(0, projOp2, term3_2, term2_2, term1_2, sum_2, eigenVals[1], TF, TFsq);  //This is the P2
+copyToComplexMat(projOp2, Eig2Term);
+gsl_matrix_complex_scale(Eig2Term, gsl_complex_polar(1, -L*eigenVals[1]));
 
 gsl_matrix *term1_3= gsl_matrix_alloc(3,3);
 gsl_matrix *term2_3= gsl_matrix_alloc(3,3);
 gsl_matrix *term3_3= gsl_matrix_alloc(3,3);
 gsl_matrix *sum_3= gsl_matrix_alloc(3,3);
-gsl_matrix *resultt3= gsl_matrix_alloc(3,3);
-
-sumTerms(0, resultt3, term3_3, term2_3, term1_3, sum_3, eigenVals[2], TF, TFsq);
-
-
+gsl_matrix *projOp3= gsl_matrix_alloc(3,3);
+gsl_matrix_complex *Eig3Term = gsl_matrix_complex_alloc(3, 3);
+sumTerms(0, projOp3, term3_3, term2_3, term1_3, sum_3, eigenVals[2], TF, TFsq);  //This is the P3
+copyToComplexMat(projOp3, Eig3Term);
+gsl_matrix_complex_scale(Eig3Term, gsl_complex_polar(1, -L*eigenVals[2]));
 
 
 gsl_matrix_complex *FlavorOp = gsl_matrix_complex_alloc(3, 3);
-gsl_matrix *theSum = gsl_matrix_alloc(3, 3);
-addMatrices(resultt, resultt2, resultt3, theSum);
 
-copyToComplexMat(theSum, FlavorOp);
+addComplexMatrices(Eig1Term, Eig2Term, Eig3Term, FlavorOp);
+
+gsl_matrix *ProjectionOperators[3];
+
+ProjectionOperators[0]=projOp1;
+ProjectionOperators[1]=projOp2;
+ProjectionOperators[2]=projOp3;
+
+
+
 cout << "Operator in flavor basis ready!" << endl;
 
+//Build probability amplitude.
+
 int a, b;
+gsl_matrix *ProbAmps = gsl_matrix_alloc(3, 3);
+initializeMatrixZero(ProbAmps);
+gsl_matrix *thisIter = gsl_matrix_alloc(3, 3);
 for(a=0;a<3;a++){
-for(b=0;b<3;b++){
-cout << GSL_REAL(gsl_matrix_complex_get(FlavorOp, a, b)) <<"+i"<< GSL_IMAG(gsl_matrix_complex_get(FlavorOp, a, b))<< endl;
-
+	for(b=a;b<3;b++){
+		initializeMatrixZero(thisIter);
+		double sinX = gsl_sf_sin((eigenVals[a]-eigenVals[b])*L/2);
+		double sinSqX=sinX*sinX;
+		gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1., ProjectionOperators[a], ProjectionOperators[b], 0., thisIter);
+		gsl_matrix_scale(thisIter, -4*sinSqX);
+		gsl_matrix_add(ProbAmps, thisIter);
+}
 }
 
-}
+gsl_matrix_add(ProbAmps, Itty);
 
-//cout << gsl_matrix_get(term1, 1, 0)+gsl_matrix_get(term2, 1, 0)+gsl_matrix_get(TFsq, 1, 0)<< endl;
+cout << "Matrix of probability amplitudes ready!" << endl;
+
+
+
 
 t2=clock();
 float diff ((float)t2-(float)t1);
@@ -269,32 +300,31 @@ int alpha, beta, a, b;
 long double sum;
 for (alpha=0;alpha<3;alpha++){
 	for (beta=0;beta<3; beta++){
-sum=0.;
+		sum=0.;
 		for (a=0;a<3;a++){
 			for (b=0;b<3;b++){
-sum += gsl_matrix_get(CKM, alpha, a)*gsl_matrix_get(CKM, beta, b)*gsl_matrix_get(toTransform, a, b);
+				sum += gsl_matrix_get(CKM, alpha, a)*gsl_matrix_get(CKM, beta, b)*gsl_matrix_get(toTransform, a, b);
 
 			}
 		}
-gsl_matrix_set(destiny, alpha, beta, sum);
+	gsl_matrix_set(destiny, alpha, beta, sum);
 	}
 }
 }
 
 gsl_matrix Ident(gsl_matrix *matrix){
 int i, k;
-for(i=0;i<3;i++){
-for(k=0;k<3;k++){
-if(i==k){
-gsl_matrix_set(matrix, i, k, 1);
-}
-else{
-gsl_matrix_set(matrix, i, k,0);
-}
-}
-}
-
-return *matrix;
+	for(i=0;i<3;i++){
+		for(k=0;k<3;k++){
+			if(i==k){
+				gsl_matrix_set(matrix, i, k, 1);
+			}
+			else{
+				gsl_matrix_set(matrix, i, k,0);
+			}
+		}
+	}
+	return *matrix;
 }
 
 void scaleToOther(gsl_matrix *toScale, double scaleFactor, gsl_matrix *result){
@@ -327,19 +357,32 @@ for (i=0;i<3;i++){
 	}
 }
 
+void addComplexMatrices(gsl_matrix_complex *mat1, gsl_matrix_complex *mat2, gsl_matrix_complex *mat3,gsl_matrix_complex *result){
+
+int i, k;
+for (i=0;i<3;i++){
+	for (k=0;k<3;k++){
+		gsl_complex elem1 = gsl_matrix_complex_get(mat1, i, k);
+		gsl_complex elem2 = gsl_matrix_complex_get(mat2, i, k);
+		gsl_complex elem3 = gsl_matrix_complex_get(mat3, i, k);
+		gsl_complex sum = gsl_complex_add(gsl_complex_add(elem1, elem2), elem3);
+		gsl_matrix_complex_set(result, i, k, sum);
+		}
+	}
+}
+
+
 void sumTerms(int index, gsl_matrix *result, gsl_matrix *term3, gsl_matrix *term2, gsl_matrix *term1, gsl_matrix *sum, double eigVal,  gsl_matrix *Tmat, gsl_matrix *TmatSQ){
 
-
-gsl_complex compFac = gsl_complex_polar(1., -L*eigVal);
-double extFactor = 1./(3.*pow(eigVal, 2) + c1);
-scaleToOther(Tmat, eigVal, term2);
-scaleToOther(Itty, pow(eigVal, 2) + c1, term1);
-addMatrices(term1, term2, TmatSQ, sum);
-scaleToOther(sum, extFactor, result);
-gsl_matrix_free(term3);
-gsl_matrix_free(term2);
-gsl_matrix_free(term1);
-gsl_matrix_free(sum);
+	double extFactor = 1./(3.*eigVal*eigVal + c1);
+	scaleToOther(Tmat, eigVal, term2);
+	scaleToOther(Itty, eigVal*eigVal + c1, term1);
+	addMatrices(term1, term2, TmatSQ, sum);
+	scaleToOther(sum, extFactor, result);
+	gsl_matrix_free(term3);
+	gsl_matrix_free(term2);
+	gsl_matrix_free(term1);
+	gsl_matrix_free(sum);
 
 
 }
@@ -349,10 +392,19 @@ int i, k;
 gsl_complex elem;
 for (i=0;i<3;i++){
 	for (k=0;k<3;k++){
-elem =real2comp(gsl_matrix_get(initial, i, k));
-gsl_matrix_complex_set(result, i, k, elem);
+		elem =real2comp(gsl_matrix_get(initial, i, k));
+		gsl_matrix_complex_set(result, i, k, elem);
 		}
 	}
 
+}
+
+void initializeMatrixZero(gsl_matrix *initial){
+int i, k;
+	for(i=0;i<3;i++){
+		for(k=0;k<3;k++){
+			gsl_matrix_set(initial, i, k, 0.);
+		}
+	}
 }
 
