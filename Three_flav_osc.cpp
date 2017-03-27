@@ -4,8 +4,6 @@ using namespace std;
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_complex_math.h>
-#include <complex>
-#include <cmath>
 #include <gsl/gsl_sf_trig.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_eigen.h>
@@ -34,7 +32,7 @@ int theta3 = 45; //Degrees
 
 
 //Distance
-float L=1;
+float L;
 double neutrinoEnergy;
 //Trace
 long double traceHm = 0;
@@ -71,7 +69,8 @@ long double c0, c1;
 
 int main(int argc, char* argv[]){
 
-neutrinoEnergy=1e9;
+neutrinoEnergy=atof(argv[1]);
+L=atof(argv[3]);
 clock_t t1,t2;
 t1=clock();
 
@@ -96,7 +95,7 @@ Ut1=gsl_sf_sin(theta1)*gsl_sf_sin(theta3)-gsl_sf_sin(theta2)*gsl_sf_cos(theta2)*
 Ut2=-gsl_sf_sin(theta1)*gsl_sf_cos(theta3)-gsl_sf_sin(theta2)*gsl_sf_sin(theta3)*gsl_sf_cos(theta1);
 Ut3=gsl_sf_cos(theta1)*gsl_sf_cos(theta2);
 
-cout << "Matrix elements calculated" << endl;
+//cout << "Matrix elements calculated" << endl;
 
 //Build CKM matrix.
 
@@ -112,20 +111,20 @@ gsl_matrix_set (CKM, 2, 0, Ut1);
 gsl_matrix_set (CKM, 2, 1, Ut2);
 gsl_matrix_set (CKM, 2, 2, Ut3); 
 
-cout << "CKM matrix built..." << endl;
+//cout << "CKM matrix built..." << endl;
 
 
 //Invert CKM matrix.
 gsl_matrix *ICKM = gsl_matrix_alloc(3, 3);
 gsl_matrix_transpose_memcpy(ICKM, CKM);
-cout << "CKM matrix inverted (transposed)..." << endl;
+//cout << "CKM matrix inverted (transposed)..." << endl;
 
 
 
 //Matter density A
-A=1E-13;//(1/sqrt(2))*G_f*(1/(m_N*1E-3))*density(L);
+A=atof(argv[2]);//(1/sqrt(2))*G_f*(1/(m_N*1E-3))*density(L);
 
-cout << "The matter density is " << A << endl;
+//cout << "The matter density is " << A << endl;
 
 //Build matrix T
 gsl_matrix *T = gsl_matrix_alloc(3, 3);
@@ -139,7 +138,7 @@ gsl_matrix_set(T, 1, 2, A*Ue2*Ue3);
 gsl_matrix_set(T, 2, 0, A*Ue1*Ue3);
 gsl_matrix_set(T, 2, 1, A*Ue2*Ue3);
 gsl_matrix_set(T, 2, 2, A*pow(Ue3,2)+(1./3)*(E31+E32-A));
-cout << "Matrix T calculated..." << endl;
+//cout << "Matrix T calculated..." << endl;
 
 //Calculate c0.
 c0=gsl_matrix_get(T,0, 0)*gsl_matrix_get(T,1, 1)*gsl_matrix_get(T,2, 2)-gsl_matrix_get(T,0,0)*gsl_matrix_get(T,1,2)*gsl_matrix_get(T,2,1)-gsl_matrix_get(T,0,1)*gsl_matrix_get(T,1,0)*gsl_matrix_get(T,2,2)+gsl_matrix_get(T,0,1)*gsl_matrix_get(T,2,0)*gsl_matrix_get(T,1,2)+gsl_matrix_get(T,0,2)*gsl_matrix_get(T,1,0)*gsl_matrix_get(T,2,1)-gsl_matrix_get(T,0,2)*gsl_matrix_get(T,2,0)*gsl_matrix_get(T,1,1);
@@ -150,7 +149,7 @@ c0 *= -1.;
 //Calculate c1.
 c1=gsl_matrix_get(T,0,0)*gsl_matrix_get(T,1,1)+gsl_matrix_get(T,0,0)*gsl_matrix_get(T,2,2)+gsl_matrix_get(T,1,1)*gsl_matrix_get(T,2,2)-gsl_matrix_get(T,1,2)*gsl_matrix_get(T,2,1)-gsl_matrix_get(T,0,1)*gsl_matrix_get(T,1,0)-gsl_matrix_get(T,0,2)*gsl_matrix_get(T,2,0);
 
-cout << "Constants c_i calculated..." << endl;
+//cout << "Constants c_i calculated..." << endl;
 
 //Calculate eigenvalues.
 gsl_complex atanArg = gsl_complex_rect((1./c0)*sqrt(-pow(c0, 2)-(4./27.)*pow(c1, 3)), 0);
@@ -166,8 +165,8 @@ gsl_complex lam2 = gsl_complex_sub(gsl_complex_mul_real(s1Ps2, -1./2.), gsl_comp
 
 gsl_complex lam3 = s1Ps2;
 
-cout << GSL_REAL(lam2) << endl;
-cout << "Eigenvalues calculated..." << endl;
+//cout << GSL_REAL(lam2) << endl;
+//cout << "Eigenvalues calculated..." << endl;
 // /*
 //Build matrix T**2
 gsl_matrix *Tsq = gsl_matrix_alloc(3, 3);
@@ -183,8 +182,8 @@ gsl_matrix_set(Tsq, 2, 2, (1./3.)*(pow(A, 2)*(pow(Ue3, 2) + (1./3.)) + 2.*A*(pow
 
 
 
-cout << gsl_matrix_get(Tsq, 0, 2) << endl;
-cout << "Matrix T**2 calculated..." << endl;
+//cout << gsl_matrix_get(Tsq, 0, 2) << endl;
+//cout << "Matrix T**2 calculated..." << endl;
 
 //Transform matrices to flavor basis
 gsl_matrix *TFsq = gsl_matrix_alloc(3, 3);
@@ -192,7 +191,7 @@ toFlavor(Tsq, TFsq, CKM);
 gsl_matrix *TF = gsl_matrix_alloc(3, 3);
 toFlavor(T, TF, CKM);
 
-cout << "T and T**2 have been converted to flavor basis..." <<endl;
+//cout << "T and T**2 have been converted to flavor basis..." <<endl;
 
 
 
@@ -248,7 +247,7 @@ ProjectionOperators[2]=projOp3;
 
 
 
-cout << "Operator in flavor basis ready!" << endl;
+//cout << "Operator in flavor basis ready!" << endl;
 
 //Build probability amplitude.
 
@@ -269,14 +268,14 @@ for(a=0;a<3;a++){
 
 gsl_matrix_add(ProbAmps, Itty);
 
-cout << "Matrix of probability amplitudes ready!" << endl;
+//cout << "Matrix of probability amplitudes ready!" << endl;
 
 
 
 
 t2=clock();
 float diff ((float)t2-(float)t1);
-cout<<"Time elapsed " << diff/CLOCKS_PER_SEC * 1E3 <<  "ms" << endl;
+//cout<<"Time elapsed " << diff/CLOCKS_PER_SEC * 1E3 <<  "ms" << endl;
 
 
 return 0;

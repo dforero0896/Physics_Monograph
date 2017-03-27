@@ -4,6 +4,6 @@ g++ -o oscillations Three_flav_osc.cpp `gsl-config --cflags --libs`
 
 echo Compilation ready
 
-./oscillations 1e9
+./oscillations 1e9 1e-13
 
 
