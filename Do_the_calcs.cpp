@@ -1,6 +1,14 @@
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_complex_math.h>
+#include <gsl/gsl_sf_trig.h>
+#include <gsl/gsl_blas.h>
+#include <gsl/gsl_eigen.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_linalg.h>
 using namespace std;
 
 /*
@@ -27,22 +35,24 @@ t1=clock();
 
 int i;
 double totalLen = 2885. + 6972.; //km
-double interval = totalLen/npoints;
+double interval = totalLen/(10.*npoints);
 double energia = 1e10 - 1e9;
 double energySpacing = energia/npoints;
-for(i=0;i<npoints;i++){
-	Energies[i]=i*energySpacing;
-	LengthsArray[i]=i*interval;
-	if(LengthsArray[i]<2885.){
+int k;
+for(k=1;k<npoints;k++){
+	double actualEnergy=k*energySpacing;
+	for(i=0;i<npoints;i++){
+		if(LengthsArray[i]<2885.){
 		DensityArray[i]=1.7e-13; //eV
-	}
-	else{
+		}
+		else{
 		DensityArray[i]=4.4e-13; //eV
-	}
+		}	
+		std::stringstream stream;
+		stream <<"./oscillations " << " " <<  actualEnergy  << " " << DensityArray[i] << " " << LengthsArray[i] ;
+		system(stream.str().c_str());
 
-std::stringstream stream;
-stream <<"./oscillations " << Energies[i] << DensityArray[i] << LengthsArray[i] ;
-system(stream.str().c_str());
+	}
 
 
 }
