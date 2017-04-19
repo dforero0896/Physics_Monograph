@@ -66,13 +66,15 @@ void initializeMatrixZero(gsl_matrix *initial);
 void calculateOperator(double nEnergy, double dist, double dens, gsl_matrix_complex *container);
 void copyToComplexMatFromComplex(gsl_matrix_complex *initial, gsl_matrix_complex *result);
 void linspace(double array[], double max, double min, int arraylen);
-gsl_matrix IdentComp(gsl_matrix_complex *matrix);
+gsl_matrix_complex IdentComp(gsl_matrix_complex *matrix);
 
 
 
 
 
 int main(int argc, char* argv[]){
+
+
 omp_set_num_threads(4);
 int N=100;
 double EnergyLins[N];
@@ -83,43 +85,33 @@ double DensityStep[10000];
 densityStep(DensityStep, spatialArr, 10000);
 
 double Probabilities[N];
-//calculateOperator(1e9, densityStep(1.), 1e-14, OpProduct);
+
 int i, k;
-/*
-# pragma omp parallel for private(i, k)
 
-for(i=0;i<3;i++){
-#pragma omp parallel for
-for(k=0;k<3;k++){
-//cout << GSL_REAL(gsl_matrix_complex_get(OpProduct, i, k)) << " \n from thread "<<  omp_get_thread_num() <<endl;
-cout << omp_get_thread_num() << endl;
-}
-}
-
-
-*/
-
+//#pragma omp parallel for private(i, k)
 //Iterate over the energies
 for(i=0;i<N;i++){
 	double energy = EnergyLins[i];
 	gsl_matrix_complex *OpProduct = gsl_matrix_complex_alloc(3, 3);
 	IdentComp(OpProduct);
+//	#pragma omp parallel for private(k)
 	for(k=0;k<10000;k++){
 		calculateOperator(energy, spatialArr[k], DensityStep[k], OpProduct);
 	}
 	gsl_matrix_complex *OpProductH = gsl_matrix_complex_alloc(3, 3);
 	gsl_matrix_complex *Probs = gsl_matrix_complex_alloc(3, 3);
 	copyToComplexMatFromComplex(OpProduct, OpProductH);
-	gsl_blas_dgemm(CblasNoTrans, CblasConjTrans, 1., OpProduct, OpProductH, 0., Probs);
+	gsl_blas_zgemm(CblasNoTrans, CblasConjTrans, real2comp(1.), OpProduct, OpProductH, real2comp(0.), Probs);
 	Probabilities[i]=GSL_REAL(gsl_matrix_complex_get(Probs, 0, 1));
+	cout<<energy<<"," << GSL_REAL(gsl_matrix_complex_get(Probs, 0, 1)) << endl;
 	gsl_matrix_complex_free(OpProduct);
 	gsl_matrix_complex_free(OpProductH);
 	gsl_matrix_complex_free(Probs);
-
+	
 	
 	
 }
-}
+
 	
 
 
@@ -129,10 +121,6 @@ for(i=0;i<N;i++){
 
 
 
-
-//t2=clock();
-//float diff ((float)t2-(float)t1);
-//cout<<"Time elapsed " << diff/CLOCKS_PER_SEC * 1E3 <<  "ms" << endl;
 
 
 return 0;
@@ -187,15 +175,15 @@ int i, k;
 	return *matrix;
 }
 
-gsl_matrix IdentComp(gsl_matrix_complex *matrix){
+gsl_matrix_complex IdentComp(gsl_matrix_complex *matrix){
 int i, k;
 	for(i=0;i<3;i++){
 		for(k=0;k<3;k++){
 			if(i==k){
-				gsl_matrix_complex_set(matrix, i, k, 1);
+				gsl_matrix_complex_set(matrix, i, k, real2comp(1.));
 			}
 			else{
-				gsl_matrix_complex_set(matrix, i, k,0);
+				gsl_matrix_complex_set(matrix, i, k,real2comp(0.));
 			}
 		}
 	}
@@ -301,8 +289,7 @@ void calculateOperator(double nEnergy, double dist, double dens, gsl_matrix_comp
 
 neutrinoEnergy=nEnergy;
 L=dist;
-clock_t t1,t2;
-t1=clock();
+
 
 //Energy differences.
 E21=energies(dm21, neutrinoEnergy);
@@ -313,7 +300,7 @@ E23=-E32;
 E31=-E12-E23;
 E13=-E31;
 
-traceHm=0;
+traceHm=dM32+0.5*(dm21/E21 + E21)+dens;
 //Calculate matrix elements.
 Ue1 = gsl_sf_cos(theta2)*gsl_sf_cos(theta3);
 Ue2 = gsl_sf_sin(theta3)*gsl_sf_cos(theta2);
@@ -500,7 +487,7 @@ gsl_matrix_add(ProbAmps, Itty);
 
 gsl_matrix_complex *copyPrevOp = gsl_matrix_complex_alloc(3, 3);
 copyToComplexMatFromComplex(container, copyPrevOp);
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1., FlavorOp, copyPrevOp, 0., container);
+gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, real2comp(1.), FlavorOp, copyPrevOp, real2comp(0.), container);
 
 gsl_matrix_complex_free(copyPrevOp);
 }
