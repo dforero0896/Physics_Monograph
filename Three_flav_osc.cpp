@@ -300,7 +300,7 @@ E23=-E32;
 E31=-E12-E23;
 E13=-E31;
 
-traceHm=dM32+0.5*(dm21/E21 + E21)+dens;
+traceHm=1e3;
 //Calculate matrix elements.
 Ue1 = gsl_sf_cos(theta2)*gsl_sf_cos(theta3);
 Ue2 = gsl_sf_sin(theta3)*gsl_sf_cos(theta2);
