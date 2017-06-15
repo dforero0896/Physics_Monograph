@@ -1,0 +1,4 @@
+Linear code:
+117.027537921
+Parallel code:
+67.878356281
