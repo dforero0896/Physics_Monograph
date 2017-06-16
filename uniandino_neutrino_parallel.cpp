@@ -2,6 +2,7 @@
 for the physicist and geoscientist degree at Universidad
 de Los Andes*/
 #include<iostream>
+#include <vector>
 using namespace std;
 #include<gsl/gsl_sf_trig.h>
 #include <gsl/gsl_matrix.h>
@@ -46,6 +47,31 @@ void densityStep ( double *fill , double *dist, int arraysize){
 		else {fill[i] = 4.4e-13;}
 	}
 
+}
+vector<double> density_array_from_key (string key, int steps){
+	vector<double> potential;
+	potential.reserve(steps);
+	double path[steps];
+	if(key=="fig_1"){
+		linspace(path, 2885. + 6972., 0., steps);
+		for(int i=0;i<steps;i++){
+			if(path[i] < 2885.){potential[i]=1.7e-13;}
+			else {potential[i] = 4.4e-13;}
+		}
+	}
+	else if(key=="fig_6"){
+		linspace(path, 12742., 0., steps);
+		for(int i=0;i<steps;i++){
+			potential[i]=3.8e-13*(0.0000001+path[i]/12742.);
+		}
+	}
+	else if(key=="fig_4"){
+		linspace(path, 12742., 0., steps);
+		for(int i=0;i<steps;i++){
+			potential[i]=3e-13;
+		}
+	}
+	return potential;
 }
 void fill_real_matrix(gsl_matrix *empty, double elem_11, double elem_12, double elem_13, double elem_21, double elem_22, double elem_23, double elem_31, double elem_32, double elem_33){
   gsl_matrix_set(empty, 0, 0, elem_11);
@@ -307,49 +333,34 @@ int main(int argc, char const *argv[]) {
 	int Steps=1000;
 	double EnergyLins[N];
 	linspace(EnergyLins, 1e10, 1e9, N);
-	double spatialArr[Steps];
-	linspace(spatialArr, 2885.+6972., 0, Steps);
-	double DensityStep[Steps];
-	densityStep(DensityStep, spatialArr, Steps);
+	vector<double> DensityStep = density_array_from_key("fig_4", Steps);
 	omp_set_num_threads(4);
-int i,k;
-double Probabilities[N];
-#pragma omp parallel for private(i)
-
-for(i=0;i<N;i++){
-  double energy=EnergyLins[i];
-  gsl_matrix *Id =gsl_matrix_alloc(3, 3);
-  gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
-  generate_real_identity(Id);
-  copy_to_complex_from_real(Id, operator_product);
-	#pragma omp parallel for private(k)
-  for(k=0;k<Steps;k++){
-    double density=DensityStep[k];
-		double len = (2885.+6972.)/Steps;
-    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
-    *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
-    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
-    copy_to_complex_from_complex(operator_product, operator_product_copy);
-    gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, gsl_complex_rect(1., 0), iter_operator, operator_product_copy, gsl_complex_rect(0., 0.),operator_product);
-    gsl_matrix_complex_free(operator_product_copy);
-    gsl_matrix_complex_free(iter_operator);
-  }
-  /*gsl_matrix_complex *operator_product_hermitian = gsl_matrix_complex_alloc(3,3);
-  gsl_matrix_complex *probability_matrix = gsl_matrix_complex_alloc(3,3);
-  copy_to_complex_from_complex(operator_product,operator_product_hermitian);
-  gsl_blas_zgemm(CblasNoTrans, CblasConjTrans, gsl_complex_rect(1., 0.), operator_product, operator_product_hermitian, gsl_complex_rect(0.,0.), probability_matrix);
-  cout<<energy<<"," << GSL_REAL(gsl_matrix_complex_get(probability_matrix, 1, 0)) << endl;
-  gsl_matrix_complex_free(operator_product_hermitian);
-  gsl_matrix_complex_free(operator_product);
-  gsl_matrix_complex_free(probability_matrix);
-	gsl_matrix_free(Id);*/
-	Probabilities[i] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
-
-
-}
-
-for(i=0;i<N;i++){
-	cout << EnergyLins[i] << "," << Probabilities[i] << endl;
-}
+	int i,k;
+	double Probabilities[N];
+	#pragma omp parallel for private(i)
+	for(i=0;i<N;i++){
+	  double energy=EnergyLins[i];
+	  gsl_matrix *Id =gsl_matrix_alloc(3, 3);
+	  gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
+	  generate_real_identity(Id);
+	  copy_to_complex_from_real(Id, operator_product);
+		#pragma omp parallel for private(k)
+	  for(k=0;k<Steps;k++){
+	    double density=DensityStep[k];
+			//double len = (2885.+6972.)/Steps; //When figure 1 is plotted
+			double len = 12742./Steps; //When figure 4 or 6 are plotted
+	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
+	    *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
+	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
+	    copy_to_complex_from_complex(operator_product, operator_product_copy);
+	    gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, gsl_complex_rect(1., 0), iter_operator, operator_product_copy, gsl_complex_rect(0., 0.),operator_product);
+	    gsl_matrix_complex_free(operator_product_copy);
+	    gsl_matrix_complex_free(iter_operator);
+	  }
+		Probabilities[i] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
+	}
+	for(i=0;i<N;i++){
+		cout << EnergyLins[i] << "," << Probabilities[i] << endl;
+	}
   return 0;
 }
