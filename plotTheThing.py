@@ -12,3 +12,10 @@ plt.xlabel('$E_{\\nu}$(eV)', fontsize=15)
 plt.ylabel('$P_{\mu e}$', fontsize=15)
 plt.gcf()
 plt.savefig('probPlot.png')
+
+
+energyData=np.loadtxt('allowed_energies.csv', dtype=float)
+enerfig=plt.figure()
+plt.hist(energyData, bins=100, normed=True)
+plt.gcf()
+plt.savefig('allowed_energies_hist.png')
