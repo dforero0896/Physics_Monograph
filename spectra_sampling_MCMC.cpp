@@ -14,18 +14,20 @@ using namespace std;
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_randist.h>
 #include<cmath>
+#include <sys/time.h>
 
 const gsl_rng_type *Gen_Type;
 gsl_rng *Gen;
-int i, N;
+int i;
+const int N=5000;
 gsl_interp_accel *acc;
 gsl_spline *spline;
-
+struct timeval t;
 
 
 
 //"../../AntineutrinoSpectrum_all/AntineutrinoSpectrum_238U.knt"
-void spectrum_array2D(string filename, float to_fill[4500][2]){
+void spectrum_array2D(string filename, double to_fill[4500][2]){
   ifstream infile(filename.c_str());
 
   string x, y;
@@ -38,63 +40,68 @@ void spectrum_array2D(string filename, float to_fill[4500][2]){
       istringstream x_str(x);
       istringstream y_str(y);
       double x_num, y_num;
-      x_str>>x_num ;
+      x_str>>x_num;
       y_str>>y_num;
       //y_vec.push_back(y_num);
-      to_fill[i-12][0]=x_num;
+      to_fill[i-12][0]=x_num/1000;
       to_fill[i-12][1]=y_num;
       //x_vec.push_back(x_num);
       //cout << y  << endl;
       x_str.clear();
       y_str.clear();
-      //cout << y_num << endl;
 
     }
 
   }
 }
-vector<double> MH_spectrum_sampling(float spectrum_array[4500][2], int num_to_gen){
-  vector <double> markov_chain;
-  double initial_value= 5*gsl_rng_uniform_pos(Gen);
-  markov_chain.push_back(initial_value);
-  for(int i=0;i<num_to_gen;i++){
-    double possible_jump=gsl_ran_gaussian(Gen, 0.1)+markov_chain[i];
+void MH_spectrum_sampling(double spectrum_array[4500][2],double markov_chain[N]){
+  double initial_value= 3.5*gsl_rng_uniform_pos(Gen);
+  markov_chain[0]=initial_value;
+  cout << initial_value << endl;
+  for(int i=0;i<N-1;i++){
+    double possible_jump=abs(gsl_ran_gaussian(Gen, 0.1)+markov_chain[i]);
+    if(possible_jump<spectrum_array[0][0]){possible_jump=spectrum_array[0][0];}
     double criteria = gsl_spline_eval(spline, possible_jump, acc)/gsl_spline_eval(spline, markov_chain[i], acc);
     if(criteria>=1.){
-      markov_chain.push_back(abs(possible_jump));
+      cout << abs(possible_jump) << endl;
+      markov_chain[i+1]=abs(possible_jump);
     }
     else{
       double other_random = gsl_rng_uniform_pos(Gen);
       if(other_random<=criteria){
-        markov_chain.push_back(possible_jump);
+        cout << possible_jump << endl;
+        markov_chain[i+1]=possible_jump;
       }
       else{
-        markov_chain.push_back(markov_chain[i]);
+        cout << markov_chain[i] << endl;
+        markov_chain[i+1]=markov_chain[i];
       }
     }
   }
-  return markov_chain;
 }
-double *split_array(float to_split[4500][2], int comp){
-  double to_return[4500];
+void split_array(double to_split[4500][2], double to_return[4500], int comp){
   for(int k=0;k<4500;k++){
-    to_return[k]=to_split[k][i];
+    to_return[k]=to_split[k][comp];
   }
-  return to_return;
 }
 int main(int argc, char const *argv[]) {
-  float U_238[4500][2];
+  double U_238[4500][2];
   spectrum_array2D("../AntineutrinoSpectrum_all/AntineutrinoSpectrum_238U.knt", U_238);
-  gsl_rng_env_setup();
   Gen_Type = gsl_rng_taus;
   Gen = gsl_rng_alloc(Gen_Type);
+  gsl_rng_env_setup();
+  gettimeofday(&t,NULL);
+  int seed = (t.tv_sec * 1000) + (t.tv_usec / 1000);
+  gsl_rng_set(Gen, seed);
   acc = gsl_interp_accel_alloc();
   spline = gsl_spline_alloc(gsl_interp_cspline, 4500);
-  double *x_arr = split_array(U_238, 0);
-  double *y_arr = split_array(U_238, 1);
-  cout << x_arr[30] << endl;
+  double x_arr[4500], y_arr[4500];
+  split_array(U_238, x_arr, 0);
+  split_array(U_238, y_arr, 1);
   gsl_spline_init(spline, x_arr, y_arr, 4500);
-  vector <double> rand_sampl = MH_spectrum_sampling(U_238, 100);
+  //cout << gsl_spline_eval(spline, 3.5, acc) << endl;
+  double rand_sampl[N];
+  MH_spectrum_sampling(U_238, rand_sampl);
 
   return 0;
 }

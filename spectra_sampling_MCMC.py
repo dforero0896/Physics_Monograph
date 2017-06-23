@@ -46,12 +46,14 @@ def MH_Spectrum_Sampling(spectrum, niter):
 #Define the number of geoneutrinos to be generated.
 if rank==0:
 #    n_geoneutrinos=int(input("Please enter the number of Geoneutrinos to generate: "))
-     n_geoneutrinos=1000000
+     n_geoneutrinos=5000
+
 else:
     n_geoneutrinos=None
 n_geoneutrinos = comm.bcast(n_geoneutrinos, root=0)
 
-
+energy=MH_Spectrum_Sampling(data238U, int(n_geoneutrinos/world_size))
+'''
 #Define function that calculates how many geoneutrinos are produced by isotope of a given concentration, half_life, geoneutrinos per decy and in time T.
 def calculate_geoneutrino_number(concentration, half_life, geo_nu_per_decay, T=1.):
     return geo_nu_per_decay*(1-2**-(T/half_life))*concentration
@@ -72,3 +74,4 @@ if rank<3:
 
 new_weights=int(weights[3]/world_size)
 e_r3N=MH_Spectrum_Sampling(isotopes[3], new_weights)
+'''
