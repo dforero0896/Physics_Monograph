@@ -46,7 +46,7 @@ def MH_Spectrum_Sampling(spectrum, niter):
 #Define the number of geoneutrinos to be generated.
 if rank==0:
 #    n_geoneutrinos=int(input("Please enter the number of Geoneutrinos to generate: "))
-     n_geoneutrinos=5000
+     n_geoneutrinos=100000
 
 else:
     n_geoneutrinos=None

@@ -16,7 +16,7 @@ plt.savefig('probPlot.png')
 
 energyData=np.loadtxt('allowed_energies.csv', dtype=float)
 enerfig=plt.figure()
-plt.hist(energyData, bins=50, normed=True)
+plt.hist(energyData, bins=100, normed=True)
 ax=plt.gca()
 ax.set_yscale('log')
 plt.gcf()

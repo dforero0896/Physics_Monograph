@@ -19,7 +19,7 @@ using namespace std;
 const gsl_rng_type *Gen_Type;
 gsl_rng *Gen;
 int i;
-const int N=5000;
+const int N=100000;
 gsl_interp_accel *acc;
 gsl_spline *spline;
 struct timeval t;
@@ -44,7 +44,7 @@ void spectrum_array2D(string filename, double to_fill[4500][2]){
       y_str>>y_num;
       //y_vec.push_back(y_num);
       to_fill[i-12][0]=x_num/1000;
-      to_fill[i-12][1]=y_num;
+      to_fill[i-12][1]=y_num/1000;
       //x_vec.push_back(x_num);
       //cout << y  << endl;
       x_str.clear();
@@ -55,19 +55,19 @@ void spectrum_array2D(string filename, double to_fill[4500][2]){
   }
 }
 void MH_spectrum_sampling(double spectrum_array[4500][2],double markov_chain[N]){
-  double initial_value= 3.5*gsl_rng_uniform_pos(Gen);
+  double initial_value= 4.*gsl_rng_uniform(Gen) + 0.5;
   markov_chain[0]=initial_value;
   cout << initial_value << endl;
   for(int i=0;i<N-1;i++){
     double possible_jump=abs(gsl_ran_gaussian(Gen, 0.1)+markov_chain[i]);
-    if(possible_jump<spectrum_array[0][0]){possible_jump=spectrum_array[0][0];}
+    //if(possible_jump<spectrum_array[0][0]){possible_jump=spectrum_array[0][0];}
     double criteria = gsl_spline_eval(spline, possible_jump, acc)/gsl_spline_eval(spline, markov_chain[i], acc);
     if(criteria>=1.){
       cout << abs(possible_jump) << endl;
       markov_chain[i+1]=abs(possible_jump);
     }
     else{
-      double other_random = gsl_rng_uniform_pos(Gen);
+      double other_random = gsl_rng_uniform(Gen);
       if(other_random<=criteria){
         cout << possible_jump << endl;
         markov_chain[i+1]=possible_jump;
@@ -91,7 +91,7 @@ int main(int argc, char const *argv[]) {
   Gen = gsl_rng_alloc(Gen_Type);
   gsl_rng_env_setup();
   gettimeofday(&t,NULL);
-  int seed = (t.tv_sec * 1000) + (t.tv_usec / 1000);
+  unsigned long int seed = (t.tv_sec * 1000) + (t.tv_usec / 1000);
   gsl_rng_set(Gen, seed);
   acc = gsl_interp_accel_alloc();
   spline = gsl_spline_alloc(gsl_interp_cspline, 4500);
@@ -102,6 +102,7 @@ int main(int argc, char const *argv[]) {
   //cout << gsl_spline_eval(spline, 3.5, acc) << endl;
   double rand_sampl[N];
   MH_spectrum_sampling(U_238, rand_sampl);
+  gsl_rng_free(Gen);
 
   return 0;
 }
