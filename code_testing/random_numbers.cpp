@@ -37,9 +37,8 @@ void gen_random_uniform(){
      //Returns a positive number uniformly distributed in the range [0,1)
      //double rand_num = 3.5*gen_random_uniform();
      //Return values that follow a normal distribution.
-     //double rand_num = gsl_ran_gaussian(Gen, 0.1);
-     //cout << rand_num << endl;
-     gen_random_uniform();
+     double rand_num = gsl_ran_gaussian(Gen, 0.1)+1.;
+     cout << rand_num << endl;
    }
    //Free allocated memory
    gsl_rng_free(Gen);

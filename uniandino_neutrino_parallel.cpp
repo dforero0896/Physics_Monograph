@@ -305,7 +305,7 @@ gsl_matrix_complex calculateOperator(double neutrinoEnergy, double A, double L){
   return *evol_operator;
 }
 int main(int argc, char const *argv[]) {
-
+	int threads =4;
   //CKM matrix elements calculated just once.
 	double theta1=deg2rad(thetaA);
 	double theta2=deg2rad(thetaB);
@@ -334,10 +334,11 @@ int main(int argc, char const *argv[]) {
 	double EnergyLins[N];
 	linspace(EnergyLins, 1e10, 1e9, N);
 	vector<double> DensityStep = density_array_from_key("fig_4", Steps);
-	omp_set_num_threads(4);
+	omp_set_num_threads(threads);
 	int i,k;
 	double Probabilities[N];
 	#pragma omp parallel for private(i)
+
 	for(i=0;i<N;i++){
 	  double energy=EnergyLins[i];
 	  gsl_matrix *Id =gsl_matrix_alloc(3, 3);
