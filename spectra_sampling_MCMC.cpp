@@ -82,7 +82,7 @@ double mh_sampling(double spectrum_array[4500][2], double markov_chain[N]){
 }
 int main(int argc, char const *argv[]) {
   double U_238[4500][2];
-  string test_file="../AntineutrinoSpectrum_all/AntineutrinoSpectrum_232Th.knt";
+  string test_file="../AntineutrinoSpectrum_all/AntineutrinoSpectrum_238U.knt";
   read_file_into_2D_array(test_file, U_238);
   unsigned long int seed = time(NULL);
   gsl_rng_env_setup(); //Setup environment variables.

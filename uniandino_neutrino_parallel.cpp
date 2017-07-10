@@ -332,7 +332,7 @@ int main(int argc, char const *argv[]) {
   int N=10000;
 	int Steps=1000;
 	double EnergyLins[N];
-	linspace(EnergyLins, 1e10, 1e9, N);
+	linspace(EnergyLins, 1e11, 1e5, N);
 	vector<double> DensityStep = density_array_from_key("fig_4", Steps);
 	omp_set_num_threads(threads);
 	int i,k;
