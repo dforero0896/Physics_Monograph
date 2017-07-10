@@ -332,8 +332,12 @@ int main(int argc, char const *argv[]) {
   int N=10000;
 	int Steps=1000;
 	double EnergyLins[N];
-	linspace(EnergyLins, 1e11, 1e5, N);
-	vector<double> DensityStep = density_array_from_key("fig_4", Steps);
+	double exps[N];
+	linspace(exps, 11, 5, N);
+	for(int i=0;i<N;i++){
+		EnergyLins[i]=pow(10, exps[i]);
+	}
+	vector<double> DensityStep = density_array_from_key("fig_1", Steps);
 	omp_set_num_threads(threads);
 	int i,k;
 	double Probabilities[N];

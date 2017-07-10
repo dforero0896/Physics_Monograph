@@ -1,10 +1,27 @@
 # Physics_Monography
 Contains the files related to my thesis/monography project for the physics major at Universidad de Los Andes.
-
+## To Do
 + *DONE* Develop a C++ code for calculating the time evolution operator given an electron density distribution, reproduce graphs in Ohlsson et.al.
 + Modify the previous code for oscillating antineutrinos instead of neutrinos.
 + *DONE* Develop a C++ code for randomly sampling the energy spectra for geoneutrinos.
 + Calculate all possible density paths according to model Earth.
++ Pseudocode for the entire project.
+ + Calculate energy function for all possible paths? (As if Earth was uniform?)
++ Find a way to model HPE distributions. Implication in location of events, etc.
+
+
+ ## Index for the document.
+ + Front page
+ + Introduction: What is project about?
+ + Geoscientific background of the problem
+ + Distribution of radioactive elements. Relative abundances.
+ + Radioactivity: Neutrino emission
+ + Neutrino Physics (Caley-Hamilton method)
+ + Outline of the model/simulation: Discretization, etc.
+ + Results
+ + Analysis
+
+
 
 ## References.
 - [1] Araki, T., Enomoto, S., Furuno, K., Gando, Y., Ichimura, K., Ikeda, H., Inoue,
