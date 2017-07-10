@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.1.24)  10 JUL 2017 11:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.1.24)  10 JUL 2017 12:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -657,7 +657,7 @@ File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 
 ] (./Thesis_Document.toc
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 3.
+(Font)              <10.95> on input line 5.
 )
 \tf@toc=\write4
 \openout4 = `Thesis_Document.toc'.
@@ -677,73 +677,78 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 
  [9] [10
 
-]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 100.
+] [1
 
-Underfull \vbox (badness 2229) has occurred while \output is active []
-
- [1
+] [2
 
 ]
-LaTeX Font Info:    Try loading font information for OMS+lmr on input line 102.
-
-
-(/usr/share/texmf/tex/latex/lm/omslmr.fd
-File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 102.
- [2]
  1.
-[3
+[3] [4
 
 ]
-Overfull \hbox (3.06978pt too wide) in paragraph at lines 163--164
-[]\T1/lmr/m/n/10.95 In hac habitasse platea dic-tumst. Nul-lam turpis erat, por
-t-ti-tor ut pretium
- []
+ 2.
+[5] [6
 
-[4]
-Overfull \hbox (3.06978pt too wide) in paragraph at lines 168--169
-[]\T1/lmr/m/n/10.95 In hac habitasse platea dic-tumst. Nul-lam turpis erat, por
-t-ti-tor ut pretium
- []
+]
+ 3.
+[7] [8
 
-[5]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 213.
- [6]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 213.
+]
+ 4.
+[9] [10
+
+]
+ 5.
+[11] [12
+
+]
+ 6.
+[13] [14
+
+]
+ 7.
+[15] [16
+
+]
+ 8.
+[17] [18
+
+]
+ 9.
+[19] [20
+
+]
+ 10.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 120.
+[21]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 120.
  (./Thesis_Document.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 213.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 213.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 120.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 120.
 Package rerunfilecheck Info: File `Thesis_Document.out' has not changed.
-(rerunfilecheck)             Checksum: 1A92FA7BD76CA5E6509EAB548BBF8556;792.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 213.
+(rerunfilecheck)             Checksum: 77CAF30C2E0F8BD8D6B7E6F1312560BE;699.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 120.
  ) 
 Here is how much of TeX's memory you used:
- 6231 strings out of 494891
- 88938 string characters out of 6179039
- 170290 words of memory out of 5000000
- 9380 multiletter control sequences out of 15000+600000
- 99983 words of font info for 69 fonts, out of 8000000 for 9000
+ 6207 strings out of 494891
+ 88454 string characters out of 6179039
+ 167251 words of memory out of 5000000
+ 9359 multiletter control sequences out of 15000+600000
+ 86756 words of font info for 61 fonts, out of 8000000 for 9000
  40 hyphenation exceptions out of 8191
- 29i,11n,28p,765b,387s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dv
-ips/lm/lm-mathsy.enc}</usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/s
-hare/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/publi
-c/lm/lmcsc10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/
-texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/fonts/type1/public/lm/l
-mr17.pfb></usr/share/texmf/fonts/type1/public/lm/lmr6.pfb></usr/share/texmf/fon
-ts/type1/public/lm/lmr7.pfb></usr/share/texmf/fonts/type1/public/lm/lmr8.pfb></
-usr/share/texmf/fonts/type1/public/lm/lmr9.pfb></usr/share/texmf/fonts/type1/pu
-blic/lm/lmri10.pfb></usr/share/texmf/fonts/type1/public/lm/lmro10.pfb></usr/sha
-re/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/
-lm/lmtt10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt9.pfb>
-Output written on Thesis_Document.pdf (16 pages, 345489 bytes).
+ 29i,11n,28p,272b,357s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}</usr/share/texmf/fonts/type1/
+public/lm/lmbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/s
+hare/texmf/fonts/type1/public/lm/lmcsc10.pfb></usr/share/texmf/fonts/type1/publ
+ic/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/t
+exmf/fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fonts/type1/public/lm/lm
+r7.pfb></usr/share/texmf/fonts/type1/public/lm/lmr8.pfb></usr/share/texmf/fonts
+/type1/public/lm/lmri10.pfb></usr/share/texmf/fonts/type1/public/lm/lmro10.pfb>
+</usr/share/texmf/fonts/type1/public/lm/lmtt10.pfb>
+Output written on Thesis_Document.pdf (31 pages, 274039 bytes).
 PDF statistics:
- 230 PDF objects out of 1000 (max. 8388607)
- 195 compressed objects within 2 object streams
- 44 named destinations out of 1000 (max. 500000)
- 73 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 269 PDF objects out of 1000 (max. 8388607)
+ 222 compressed objects within 3 object streams
+ 50 named destinations out of 1000 (max. 500000)
+ 105 words of extra memory for PDF output out of 10000 (max. 10000000)
 
