@@ -16,6 +16,7 @@
 \usepackage{graphicx}
 \usepackage[english]{babel}
 \usepackage{tikz}
+\usepackage{float}
 
 
 \usepackage[compat=1.1.0]{tikz-feynman}
@@ -127,34 +128,81 @@
 	\end{equation}
 	Where $N_0$ corresponds to the number of parent isotopes at time $t=0$ and $\lambda$ is called the decay constant and is unique for every isotope.\\
 	This simple model has been key to the use of the radioactive isotopes to, for example, date rocks or organisms.\\
+	\section{Types of radioactive decay}
 	Let us now go deeper into the theory of the radioactivity.
 	
-	\section{Alpha decay}
+	\subsection{Alpha decay}
 	The theory of the alpha decay is rather simple. $\alpha$-particles are confined in a finite potential well (the nucleus $X$ ) and will, as expected, have a certain probability of tunneling said barrier. When this happens, the $\alpha$-particle will escape and leave a ``new'' (daughter) nucleus $X'$ \cite{Krane1988}. The process may be written as
 	\begin{equation}
 ^A_ZX_N\rightarrow^{A-4}_{Z-2}X'_{N-2} + \alpha
 	\end{equation}
 	Where $A$ is the atomic mass number, $Z$ is the atomic number and $N$ is the charge.\\
 	This decay involves both strong (nuclear) interactions and electromagnetic interactions since the potential well is given by confinement due to strong interaction between nucleons and the barrier has a decaying-exponential side, given by the Coulomb potential.
-	\section{Gamma decay}
+	\subsection{Gamma decay}
 	Gamma decay is similar to the common electromagnetic emission due to atomic transitions, in fact, it is produced when a metastable state of an isotope decays into a more stable state through the emission of high energy photons. It should be noted that, in this case, no change in $A$ or $N$ is produced. These metastable states are common daughter isotopes to $\alpha$ and $\beta$ decays.\\
 	Lifetimes for this kind of process is generally short, taking only fractions of a second to decay while some $\alpha$-decaying isotopes may have half-lives of the order of $10^3yr$.
-	\section{Beta decay}
-	This type of decay can be considered to be more complex than the other two, as it responds to more complicated undelying physics: the weak interaction.\\
-	There are three kinds of $\beta$ decay, which are 
-	
-	
-	\feynmandiagram [horizontal=a to b] {
-		i1 -- [fermion] a -- [fermion] i2,
-		a -- [photon] b,
-		f1 -- [fermion] b -- [fermion] f2,
-	};
-	
-	
+	\subsection{Beta decay}
+	This type of decay can be considered to be more complex than the other two, as it responds to more complicated undelying physics: the weak interaction. It consists in a set of semileptonic processes (that involve both leptons and hadrons) that will be described below.
+	\begin{itemize}
+		\item \textbf{Positive Beta decay:} 
+		\begin{equation}
+			p\rightarrow n + e^+ + \nu_e
+			\label{eq:betaplus}
+		\end{equation}
+		
+		\begin{figure}[H]
+			\centering
+			\label{fig:feynbetaplus}
+		\feynmandiagram	[layered layout,horizontal=a to b] {
+			a [particle	=$p$] -- [fermion] b -- [fermion] f1 [particle =$n$],
+			b -- [boson,edge label'	=$W^{+}$] c,c -- [fermion] f2 [particle =$ \nu_{e}$],
+			c -- [anti fermion] f3 [particle	=\(e^{+}\)],
+			};		
+			\caption{Feynman diagram for $\beta^+$ process.}	
+		\end{figure}
+		\item \textbf{Negative Beta decay:}
+		
+			\begin{equation}
+			n\rightarrow p + e^- + \bar{\nu}_e
+			\label{eq:betaminus}
+			\end{equation}
+		
+		\begin{figure}[H]
+			\centering
+			\label{fig:feynbetaminus}
+			\feynmandiagram	[layered layout,horizontal=a to b] {
+				a [particle	=$n$] -- [fermion] b -- [fermion] f1 [particle =$p$],
+				b -- [boson,edge label'	=$W^{-}$] c,c -- [anti fermion] f2 [particle =$ \bar{\nu}_{e}$],
+				c -- [fermion] f3 [particle	=$e^{-}$],
+			};			
+			\caption{Feynman diagram for $\beta^-$ process.}
+		\end{figure}
+
+\item \textbf{Electron capture:}
+\begin{equation}
+p + e^- \rightarrow n + \nu_e
+\label{eq:electroncapture}
+\end{equation}
+	\begin{figure}[H]
+		\centering
+		\label{fig:feynbetaminus}
+		\feynmandiagram [vertical=a to b] {
+			i1 [particle=$n$] -- [anti fermion] a -- [anti fermion] i2 [particle=$p$],
+			a -- [boson, edge label=$W^+$] b,
+			f1 [particle=$\nu_e$] -- [anti fermion] b -- [anti fermion] f2 [particle=$e^{-}$],
+		};		
+		\caption{Feynman diagram for electron capture.}
+	\end{figure}
+	\end{itemize}
+	Note that in all these processes new particles are created in the nucleus, which is a consequence of the weak interaction that rules them.\\
+	The particles labelled with $\nu_e$ are electron neutrinos and were proposed by Pauli in order to solve the conundrum concerning the apparently continuous energy spectra of $\beta$-decay which is against the core of quantum mechanics, the inclusion of these particles in the energy spectrum of the decay made it discrete, thus, giving a solution to the problem.\\
+	For this project, we are strictly interested in the $\beta^-$-decay since it is the one that produces antineutrinos.
+
 
 
 	
 	\section{Decay Chains}
+	Different isotopes in the Earth have decay chains involve $\beta-$-decay at some point, but there are a few ones that dominate the antineutrino production.
 	\section{(Anti)Neutrino emission}
 	\chapter{Neutrino Physics}
 	Neutrinos are neutral leptons that interact weakly and are always produced in a given  flavor eigenstate $|\nu_\alpha\rangle$ with $\alpha = e, \mu, \tau$.
