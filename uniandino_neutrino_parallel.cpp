@@ -71,6 +71,12 @@ vector<double> density_array_from_key (string key, int steps){
 			potential[i]=3e-13;
 		}
 	}
+	else if(key=="sun"){
+		linspace(path, 6.96e5, 0., steps);
+		for(int i =0;i<steps;i++){
+			potential[i]=(1./sqrt(2))*(8.96189e-47*1e9/931.494)*200*5.61e26*exp(-path[i]/66000);
+		}
+	}
 	return potential;
 }
 void fill_real_matrix(gsl_matrix *empty, double elem_11, double elem_12, double elem_13, double elem_21, double elem_22, double elem_23, double elem_31, double elem_32, double elem_33){
@@ -337,7 +343,7 @@ int main(int argc, char const *argv[]) {
 	for(int i=0;i<N;i++){
 		EnergyLins[i]=pow(10, exps[i]);
 	}
-	vector<double> DensityStep = density_array_from_key("fig_1", Steps);
+	vector<double> DensityStep = density_array_from_key("sun", Steps);
 	omp_set_num_threads(threads);
 	int i,k;
 	double Probabilities[N];
@@ -353,7 +359,8 @@ int main(int argc, char const *argv[]) {
 	  for(k=0;k<Steps;k++){
 	    double density=DensityStep[k];
 			//double len = (2885.+6972.)/Steps; //When figure 1 is plotted
-			double len = 12742./Steps; //When figure 4 or 6 are plotted
+			//double len = 12742./Steps; //When figure 4 or 6 are plotted
+			double len = 6.96e5/Steps; //When sun thing is plotted
 	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
 	    *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
 	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);

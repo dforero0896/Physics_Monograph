@@ -1,0 +1,171 @@
+% !TeX program = lualatex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% LaTeX book template                           %%
+%% Author:  Amber Jain (http://amberj.devio.us/) %%
+%% License: ISC license                          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,11pt]{book}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Source: http://en.wikibooks.org/wiki/LaTeX/Hyperlinks %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[english]{babel}
+\usepackage{tikz}
+
+
+\usepackage[compat=1.1.0]{tikz-feynman}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 'dedication' environment: To add a dedication paragraph at the start of book %
+% Source: http://www.tug.org/pipermail/texhax/2010-June/015184.html            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{dedication}
+{
+	\cleardoublepage
+	\thispagestyle{empty}
+	\vspace*{\stretch{1}}
+	\hfill\begin{minipage}[t]{0.66\textwidth}
+		\raggedright
+	}
+	{
+	\end{minipage}
+	\vspace*{\stretch{3}}
+	\clearpage
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Chapter quote at the start of chapter        %
+% Source: http://tex.stackexchange.com/a/53380 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\renewcommand{\@chapapp}{}% Not necessary...
+\newenvironment{chapquote}[2][2em]
+{\setlength{\@tempdima}{#1}%
+	\def\chapquote@author{#2}%
+	\parshape 1 \@tempdima \dimexpr\textwidth-2\@tempdima\relax%
+	\itshape}
+{\par\normalfont\hfill--\ \chapquote@author\hspace*{\@tempdima}\par\bigskip}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% First page of book which contains 'stuff' like: %
+%  - Book title, subtitle                         %
+%  - Book author name                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Book's title and subtitle
+\title{\Huge \textbf{Geoneutrino oscillations approach to discriminate distributions of HPE in the Earth's mantle using the Monte Carlo Technique.}   \\ \huge Monography for Geoscientist degree \footnote{Universidad de Los Andes - Bogotá, Colombia}}
+% Author
+\author{\textsc{Daniel Felipe Forero Sánchez}\thanks{\url{github.com/dforero0896}}}
+
+
+\begin{document}
+	
+	\frontmatter
+	\maketitle
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Add a dedication paragraph to dedicate your book to someone %
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{dedication}
+		Dedicated to Calvin and Hobbes.
+	\end{dedication}
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Auto-generated table of contents, list of figures and list of tables %
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\tableofcontents
+	\listoffigures
+	\listoftables
+	
+	\mainmatter
+	
+	%%%%%%%%%%%
+	% Preface %
+	%%%%%%%%%%%
+	\chapter*{Preface}
+
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Give credit where credit is due. %
+	% Say thanks!                      %
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section*{Acknowledgements}
+
+	
+	%%%%%%%%%%%%%%%%
+	% NEW CHAPTER! %
+	%%%%%%%%%%%%%%%%
+	\chapter{Introduction}
+	
+	\begin{chapquote}{Author's name, \textit{Source of this quote}}
+		``This is a quote and I don't know who said this.''
+	\end{chapquote}
+	
+	\chapter{Relevance of the Study}
+	
+	\chapter{Distribution of Radioactive Elements}
+
+	\section{Relative Abundances}
+	\chapter{Radioactivity}
+	Radioactivity is the phenomenon in which a parent isotope turn into a daughter isotope, with different characteristics, through the emmission of a particle.\\
+	The history of radioactivity goes back to 1896, when H. Becquerel discovered that a uranium sample emmited some kind of penetrating radiation similar to the X rays (discovered earlier that year). In the following years, three different types of emissions were identified: alpha ($\alpha$), beta ($\beta$) and gamma ($ \gamma$). The nature of each of these emissions was identified through the years, concluding that $\alpha$-particles correspond to $^4He$ nuclei, $\beta^\pm$-particles correspond to $e^\pm$ (electrons or positrons) and $\gamma$-particles are nothing but high energy photons.\\
+	Rutherford discovered that radioactive phenomena was linked directly with the nucleus ($\sim 1 fm$) of a given isotope, thus, it is an entirely quantum phenomenon.\\
+	The overall radioactive phenomena are described by a rather simple mathematical approach given the statistical behavior of the phenomena (which is a result, and evidence of how ``quantum''it is). Given $N$ parent isotopes in a sample at a given time $t$ and assuming no more are added, the rate of decay ($dN/dt$) is proportional to $N$ \cite{Krane1988} 
+	\begin{equation}
+	\frac{dN}{dt}=-\lambda N
+	\end{equation}
+	That, upon integration becomes 
+	\begin{equation}
+	N(t)=N_0\exp(-\lambda t)
+	\end{equation}
+	Where $N_0$ corresponds to the number of parent isotopes at time $t=0$ and $\lambda$ is called the decay constant and is unique for every isotope.\\
+	This simple model has been key to the use of the radioactive isotopes to, for example, date rocks or organisms.\\
+	Let us now go deeper into the theory of the radioactivity.
+	
+	\section{Alpha decay}
+	The theory of the alpha decay is rather simple. $\alpha$-particles are confined in a finite potential well (the nucleus $X$ ) and will, as expected, have a certain probability of tunneling said barrier. When this happens, the $\alpha$-particle will escape and leave a ``new'' (daughter) nucleus $X'$ \cite{Krane1988}. The process may be written as
+	\begin{equation}
+^A_ZX_N\rightarrow^{A-4}_{Z-2}X'_{N-2} + \alpha
+	\end{equation}
+	Where $A$ is the atomic mass number, $Z$ is the atomic number and $N$ is the charge.\\
+	This decay involves both strong (nuclear) interactions and electromagnetic interactions since the potential well is given by confinement due to strong interaction between nucleons and the barrier has a decaying-exponential side, given by the Coulomb potential.
+	\section{Gamma decay}
+	Gamma decay is similar to the common electromagnetic emission due to atomic transitions, in fact, it is produced when a metastable state of an isotope decays into a more stable state through the emission of high energy photons. It should be noted that, in this case, no change in $A$ or $N$ is produced. These metastable states are common daughter isotopes to $\alpha$ and $\beta$ decays.\\
+	Lifetimes for this kind of process is generally short, taking only fractions of a second to decay while some $\alpha$-decaying isotopes may have half-lives of the order of $10^3yr$.
+	\section{Beta decay}
+	This type of decay can be considered to be more complex than the other two, as it responds to more complicated undelying physics: the weak interaction.\\
+	There are three kinds of $\beta$ decay, which are \\
+	
+	
+	\feynmandiagram [horizontal=a to b] {
+		i1 -- [fermion] a -- [fermion] i2,
+		a -- [photon] b,
+		f1 -- [fermion] b -- [fermion] f2,
+	};
+	
+	
+
+
+	
+	\section{Decay Chains}
+	\section{(Anti)Neutrino emission}
+	\chapter{Neutrino Physics}
+	Neutrinos are neutral leptons that interact weakly and are always produced in a given  flavor eigenstate $|\nu_\alpha\rangle$ with $\alpha = e, \mu, \tau$.
+	\chapter{The Model}
+	\chapter{Results}
+	\chapter{Analysis}
+	\chapter{Further Problems}
+	\chapter{Conclusions}
+	\bibliographystyle{unsrt}
+	\bibliography{refs}
+		
+		
+	
+\end{document}

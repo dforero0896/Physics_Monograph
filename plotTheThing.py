@@ -10,6 +10,7 @@ ax=plt.gca()
 ax.set_xscale('log')
 plt.xlabel('$E_{\\nu}$(eV)', fontsize=15)
 plt.ylabel('$P_{\mu e}$', fontsize=15)
+plt.xlim(1e8, 1e9)
 plt.gcf()
 plt.savefig('probPlot.png')
 
