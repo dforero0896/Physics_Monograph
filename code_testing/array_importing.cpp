@@ -40,6 +40,43 @@ void spectrum_array2D(string filename, float to_fill[4500][2]){
 }
 
 
+void import_model(string filename, double model_matrix[199][10]){
+  float rad, depth, density, Vpv, Vph, Vsv, Vsh, eta, Q_mu, Q_kappa;
+  string line;
+  ifstream infile(filename.c_str());
+  int i = 0;
+  while(getline(infile, line) && i<=199){
+    istringstream splittable_line(line);
+    string field;
+    vector<double> row;
+    row.reserve(10);
+    while(getline(splittable_line, field, ',')){
+      istringstream field_ss(field);
+      double field_num;
+      field_ss >> field_num;
+      row.push_back(field_num);
+    }
+    //splittable_line >> depth;
+    //splittable_line >> Vpv;
+
+/*
+    model_matrix[i][0]=rad;
+    model_matrix[i][1]=depth;
+    model_matrix[i][2]=density;
+    model_matrix[i][3]=Vpv;
+    model_matrix[i][4]=Vph;
+    model_matrix[i][5]=Vsv;
+    model_matrix[i][6]=Vsh;
+    model_matrix[i][7]=eta;
+    model_matrix[i][8]=Q_mu;
+    model_matrix[i][9]=Q_kappa;
+    i++;
+*/
+    cout << row[4] << endl;
+    splittable_line.clear();
+  }
+}
+
 int main(int argc, char const *argv[]) {
 float arr[4500][2];
 spectrum_array2D("../../AntineutrinoSpectrum_all/AntineutrinoSpectrum_238U.knt", arr);

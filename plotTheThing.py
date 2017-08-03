@@ -4,13 +4,18 @@ import matplotlib.pyplot as plt
 
 
 probData=np.loadtxt('probsTest.csv', delimiter=',', dtype=float)
-fig=plt.figure()
-plt.plot(probData[:,0], probData[:,1])
-ax=plt.gca()
-ax.set_xscale('log')
-plt.xlabel('$E_{\\nu}$(eV)', fontsize=15)
-plt.ylabel('$P_{\mu e}$', fontsize=15)
-plt.xlim(1e8, 1e9)
+probabilities, ax = plt.subplots(1, 3, figsize=(30, 10))
+ax[0].plot(probData[:,0], probData[:,1])
+ax[1].plot(probData[:,0], probData[:,2])
+ax[2].plot(probData[:,0], probData[:,3])
+ax[0].set_ylabel('$P_{e e}$', fontsize=15)
+ax[1].set_ylabel('$P_{\mu e}$', fontsize=15)
+ax[2].set_ylabel('$P_{\\tau e}$', fontsize=15)
+
+for i in range(3):
+    ax[i].set_xscale('log')
+    ax[i].set_xlabel('$E_{\\nu}$(eV)', fontsize=15)
+    ax[i].set_xlim(1e5, 1e11)
 plt.gcf()
 plt.savefig('probPlot.png')
 

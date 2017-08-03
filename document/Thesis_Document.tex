@@ -17,7 +17,7 @@
 \usepackage[english]{babel}
 \usepackage{tikz}
 \usepackage{float}
-
+\usepackage{amsmath}
 
 \usepackage[compat=1.1.0]{tikz-feynman}
 
@@ -115,6 +115,7 @@
 
 	\section{Relative Abundances}
 	\chapter{Radioactivity}
+	\section{Overview}
 	Radioactivity is the phenomenon in which a parent isotope turn into a daughter isotope, with different characteristics, through the emmission of a particle.\\
 	The history of radioactivity goes back to 1896, when H. Becquerel discovered that a uranium sample emmited some kind of penetrating radiation similar to the X rays (discovered earlier that year). In the following years, three different types of emissions were identified: alpha ($\alpha$), beta ($\beta$) and gamma ($ \gamma$). The nature of each of these emissions was identified through the years, concluding that $\alpha$-particles correspond to $^4He$ nuclei, $\beta^\pm$-particles correspond to $e^\pm$ (electrons or positrons) and $\gamma$-particles are nothing but high energy photons.\\
 	Rutherford discovered that radioactive phenomena was linked directly with the nucleus ($\sim 1 fm$) of a given isotope, thus, it is an entirely quantum phenomenon.\\
@@ -202,10 +203,83 @@ p + e^- \rightarrow n + \nu_e
 
 	
 	\section{Decay Chains}
-	Different isotopes in the Earth have decay chains involve $\beta-$-decay at some point, but there are a few ones that dominate the antineutrino production.
+	Different isotopes in the Earth have decay chains involve $\beta-$-decay at some point, but there are a few ones that dominate the antineutrino production. 
+	\huge WAITING TO WRITE SOMETHING MORE ON RELATIVE ABUNDANCES SECTION
+	
 	\section{(Anti)Neutrino emission}
 	\chapter{Neutrino Physics}
-	Neutrinos are neutral leptons that interact weakly and are always produced in a given  flavor eigenstate $|\nu_\alpha\rangle$ with $\alpha = e, \mu, \tau$.
+	\normalsize
+	This chapter is only an overview of the special physics that surrounds these particles, for a thorough explanation you should see reference \cite{Giunti2010} and for details on time evolution reference \cite{Ohlsson2001}.\\
+	Neutrinos are neutral leptons that interact weakly and are always produced in a given  flavor eigenstate $|\nu_\alpha\rangle$ with $\alpha = e, \mu, \tau$. In equations \ref{eq:betaplus} to \ref{eq:electroncapture}, all neutrinos are labelled $\nu_e$ that stands for electron neutrino, this is because they are all associated with the ``ordinary'' matter which is composed by electrons, not tauons or muons.\\
+	So, neutrinos are produced in flavor states, but these are not mass (energy) eigenstates and, since the hamiltonian entirely controls the time evolution of a quantum system, the neutrinos will not evolve (travel) in these states but will rather oscillate between the real mass eigenstates which, as the name suggests, do have a definite (and unknown) mass, while flavor states are just a linear combination of them. This may be written as
+	\begin{equation}
+	|\nu_\alpha\rangle =\sum_{a=1}^{3} U^*_{\alpha a}|\nu_a\rangle
+	\label{eq:tansform}
+	\end{equation}
+	Here, we have labelled $|\nu_a\rangle$ the mass eigenstates, with $a=1, 2, 3$. $U^*_{\alpha a}$ is the matrix element of the transformation matrix $U^*$ \cite{Ohlsson2001}.\\
+	The matrix $U^*$ is the complex conjugate of matrix $U$, called Pontecorvo–Maki–Nakagawa–Sakata (PMNS) matrix, that rules the mixing of the neutrinos and can be parametrized as shown in \cite{Ohlsson2001}
+	\begin{equation}
+U=	\begin{bmatrix}
+	C_2C_3 & S_3C_2 & S_2  \\
+	-S_3C_1-S_1S_2C_3 & C_1C_3-S_1S_2S_3 & S_1C_2 \\
+	S_1S_3-S_2C_1C_3 & -S_1C_3-S_2S_3C_1 & C_1C_2 
+	\end{bmatrix}
+	\end{equation}
+	
+	Where $S_i\equiv\sin(\theta_i)$ and $C_i\equiv\cos(\theta_i)$. $\theta_i$ are the vacuum mixing angles. Here we have assumed there is no charge-parity (CP) phase, thus, $U=U^*$.
+	\section{Time evolution}
+	According to the principles of quantum mechanics, the hamiltonian of a system described by the ket $|\psi\rangle$ does define its time evolution according to
+	\begin{equation}
+	|\psi(t)\rangle = \exp(-i\hat{H}(t-t_0))|\psi(t_0)\rangle
+	\label{eq:gentimeevol}
+	\end{equation}
+	In the case of the neutrinos, we have settled that they do not travel in flavor state but in mass states, then, we can write
+	\begin{equation}
+	|\nu_a(t)\rangle = \exp(-\hat{H}_m(t-t_0))|\nu_a(t_0)\rangle
+	\label{eq:timeevol}
+	\end{equation}
+	In this base, the hamiltonian will be diagonal
+		\begin{equation}
+		\hat{H}_{m, unperturbed}= \begin{bmatrix}
+		E_1 & 0 & 0  \\
+		0 & E_2 & 0 \\
+		0 & 0 & E_3 
+		\end{bmatrix}
+		\label{eq:unphammass}
+		\end{equation}
+	In matter, the hamiltonian of the system is perturbed in the following way
+	\begin{equation}
+	\hat{V}_f= A	\begin{bmatrix}
+	1 & 0 & 0  \\
+	0 & 0 & 0 \\
+	0 & 0 & 0 
+	\end{bmatrix}
+	\label{eq:perturbation}
+	\end{equation}
+	Where $A$ depends on the density of the matter the neutrino is going through, and is defined as 
+	\begin{equation}
+	A(r)\approx\pm \sqrt{2}G_F\frac{\rho(r)}{m_N}
+	\label{eq:A}
+	\end{equation}
+	Here, $G_F$ is the Fermi coupling constant, $\rho(r)$ is the matter density and $m_N$ is the nucleon mass.\\
+	
+	The perturbation $V_f$ ($f$ stands for flavor base) only affects electron-flavored neutrinos because matter, as we see it, is electronic. Taking this into account, the perturbed hamiltonian, in mass basis is
+		\begin{equation}
+		\hat{H}_{m}= \begin{bmatrix}
+		E_1 & 0 & 0  \\
+		0 & E_2 & 0 \\
+		0 & 0 & E_3 
+		\end{bmatrix} + U^{-1}V_fU
+		\label{eq:hammass}
+		\end{equation}
+	
+	Introducing equation \ref{eq:hammass} into \ref{eq:timeevol} (this involves some complex algebra described in \cite{Ohlsson2001}) we can get the time evolution operator $\hat{U}_f$. Then, the transition probability from an initial $\alpha$ state to a $\beta$ one will be
+	\begin{equation}
+	P_{\alpha\rightarrow\beta}=|\langle\beta|\hat{U}_f|\alpha\rangle|^2
+	\label{eq:transprob}
+	\end{equation}
+	This will be crucial on this project, as the neutrino oscillation phenomena will affect the detection, and the path that the neutrino follows defines how much it will be affected, therefore, the effect of the phenomena is not trivial at all.\\
+	
 	\chapter{The Model}
 	\chapter{Results}
 	\chapter{Analysis}

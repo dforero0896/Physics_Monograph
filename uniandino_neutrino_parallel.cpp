@@ -343,10 +343,11 @@ int main(int argc, char const *argv[]) {
 	for(int i=0;i<N;i++){
 		EnergyLins[i]=pow(10, exps[i]);
 	}
-	vector<double> DensityStep = density_array_from_key("sun", Steps);
+	vector<double> DensityStep = density_array_from_key("fig_1", Steps);
 	omp_set_num_threads(threads);
 	int i,k;
-	double Probabilities[N];
+	double Probabilities[N][3];
+	//double Probabilities[N];
 	#pragma omp parallel for private(i)
 
 	for(i=0;i<N;i++){
@@ -358,9 +359,9 @@ int main(int argc, char const *argv[]) {
 		#pragma omp parallel for private(k)
 	  for(k=0;k<Steps;k++){
 	    double density=DensityStep[k];
-			//double len = (2885.+6972.)/Steps; //When figure 1 is plotted
+			double len = (2885.+6972.)/Steps; //When figure 1 is plotted
 			//double len = 12742./Steps; //When figure 4 or 6 are plotted
-			double len = 6.96e5/Steps; //When sun thing is plotted
+			//double len = 6.96e5/Steps; //When sun thing is plotted
 	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
 	    *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
 	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
@@ -369,10 +370,18 @@ int main(int argc, char const *argv[]) {
 	    gsl_matrix_complex_free(operator_product_copy);
 	    gsl_matrix_complex_free(iter_operator);
 	  }
-		Probabilities[i] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
+		//Probabilities[i] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
+		Probabilities[i][0] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0));
+		Probabilities[i][1] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
+		Probabilities[i][2] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,2));
+		//cout << EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2] << endl;
+
 	}
+
 	for(i=0;i<N;i++){
-		cout << EnergyLins[i] << "," << Probabilities[i] << endl;
+		cout << EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2] << endl;
+		//cout << EnergyLins[i] << "," << Probabilities[i] << endl;
 	}
+
   return 0;
 }

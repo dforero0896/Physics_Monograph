@@ -58,10 +58,10 @@ double mh_sampling(double spectrum_array[4500][2], double markov_chain[N]){
   cout << initial_value << endl;
 
   for(int i=0;i<N-1;i++){
-    double possible_jump = gsl_ran_gaussian(Gen, 0.1) + markov_chain[i];
-    while(possible_jump < 0.0005 || possible_jump>4.5){
+    double possible_jump;
+    do {
       possible_jump = gsl_ran_gaussian(Gen, 0.1) + markov_chain[i];
-    }
+    } while(possible_jump < 0.0005 || possible_jump>4.5);
     double criteria = gsl_spline_eval(spectrum_spline, possible_jump, acc)/gsl_spline_eval(spectrum_spline, markov_chain[i], acc);
     if(criteria>=1.){
       markov_chain[i+1]=possible_jump;

@@ -1,4 +1,0 @@
-Linear code:
-95.197877922
-Parallel code:
-78.221206213
