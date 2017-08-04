@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+'''
 probData=np.loadtxt('probsTest.csv', delimiter=',', dtype=float)
 probabilities, ax = plt.subplots(1, 3, figsize=(30, 10))
 ax[0].plot(probData[:,0], probData[:,1])
@@ -27,3 +27,17 @@ ax=plt.gca()
 ax.set_yscale('log')
 plt.gcf()
 plt.savefig('allowed_energies_hist.png')
+'''
+
+earth_model=np.loadtxt('earth_simul_plots.csv', delimiter=',', dtype=float)
+earthplot=plt.figure()
+plt.imshow(earth_model)
+ax=plt.gca()
+ax.set_xlabel('z', fontsize=15)
+ax.set_ylabel('x', fontsize=15)
+earthplot.colorbar(ax.imshow(earth_model))
+plt.scatter(1000, 0, s=100, label='Detector')
+plt.legend(loc=3)
+plt.gcf()
+plt.savefig('earth_test.png')
+
