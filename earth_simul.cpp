@@ -17,6 +17,7 @@ using namespace std;
 const int N = 1000;
 const int PREM_len = 187;
 const int totalNeutrinos=10000000;
+const int path_resolution = 1000; //km
 int counter =0;
 const double R_earth = 6371.;
 double dz = 2*R_earth/N;
@@ -26,6 +27,53 @@ double abundanceU_BSE[3]={12., 20., 35.};
 double abundanceTh_BSE[3]={43., 80., 140.};
 //format = {cosm, geoch, geodyn}
 
+double the_r(double x, double z, double t, char component){
+    double the_r_z=R_earth-z;
+    double the_r_x = x;
+    double the_r_mag = sqrt(the_r_x*the_r_x + the_r_z*the_r_z);
+    if (component=='x'){
+      return x-t*300000*the_r_x/the_r_mag;
+    }
+    else if(component=='z'){
+      return z+t*300000*the_r_z/the_r_mag;
+    }
+}
+
+double get_r(double x, double y){
+  return sqrt(x*x + y*y);
+}
+
+
+double density_polynomials(double radius){
+    double x = radius/6371.;
+    //inner core
+    if( radius<= 1221.5){
+        return 13.0885-8.8381*x*x;}
+    //outer core
+    else if (radius<=3480){
+        return 12.5815-1.2638*x-3.6426*x*x-5.5281*x*x*x;}
+    //lower mantle
+    else if (radius <= 5701){
+        return 7.9565-6.4761*x+5.5283*x*x-3.0807*x*x*x;}
+    //transition zone
+    else if (radius <= 5771){
+        return 5.3197-1.4836*x;}
+    else if (radius <= 5971){
+        return 11.2494-8.0298*x;}
+    else if (radius <= 6151){
+        return 7.1089-3.8045*x;}
+    //lvz + lid
+    else if (radius <= 6346.6){
+        return 2.6910+0.6924*x;}
+    //crust
+    else if (radius <= 6356){
+        return 2.9;}
+    else if (radius <= 6368){
+        return 2.6;}
+    //ocean
+    else if (radius <= 6371){
+        return 1.020;}
+}
 vector<double> calculateMantleAbundances(double c_mass, double m_mass, double t_mass, double abundance_isot[3], double crust_abundance_isot){
   vector <double> abundances;
   abundances.reserve(3);
@@ -129,8 +177,8 @@ class RingNode{
     double neutrinosProducedTh;
     double slope;
     vector<double> path;
-    bool drawPath;
-    vector<double> invPath;
+    float pathLen;
+
 
 };
 
@@ -145,7 +193,6 @@ class Planet{
     void initializeCoords(){
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
-          asArray[i][k].drawPath=0;
           asArray[i][k].x=i*dx;
           asArray[i][k].z=-6371. + k*dz;
           double r = asArray[i][k].getRadius();
@@ -176,6 +223,7 @@ class Planet{
       }
     }
     void initializeDensity(){
+      /*
       vector< vector<double> > PREM_complete;
       PREM_complete = ::import_model("../Models/PREM_1s.csv");
       double radiusArray[PREM_len], densityArray[PREM_len];
@@ -184,10 +232,12 @@ class Planet{
       gsl_interp_accel *acc = gsl_interp_accel_alloc();
       gsl_spline *spline = gsl_spline_alloc(gsl_interp_steffen, PREM_len);
       gsl_spline_init(spline, radiusArray, densityArray, PREM_len);
+      */
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
           if(asArray[i][k].isEarth){
-            asArray[i][k].massDensity=gsl_spline_eval(spline, asArray[i][k].r, acc);
+            //asArray[i][k].massDensity=gsl_spline_eval(spline, asArray[i][k].r, acc);
+            asArray[i][k].massDensity=density_polynomials(asArray[i][k].r);
             asArray[i][k].mass=asArray[i][k].massDensity*1e3*asArray[i][k].volume*1e9;
             totalMass+=asArray[i][k].mass;
             if(asArray[i][k].isCrust){
@@ -200,8 +250,8 @@ class Planet{
           else{asArray[i][k].massDensity=-1;}
         }
       }
-      gsl_spline_free(spline);
-      gsl_interp_accel_free(acc);
+      //gsl_spline_free(spline);
+      //gsl_interp_accel_free(acc);
     }
     void initializeAbundanceCrust(){
       for(int i =0 ; i<N/2;i++){
@@ -291,38 +341,19 @@ class Planet{
     void initializePaths(){
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){
-          int i_init = 0;
-          int i_end = i;
-          int k_init = 999;
-          int k_end = k;
-          int deltaX = i_end-i_init;
-          int deltaY = k_end - k_init;
-          float delta_error = abs(float(deltaY)/deltaX);
-          int k_in, i_in;
-          if(abs(deltaX)>=abs(deltaY)){
-            float error = delta_error-0.5;
-            k_in = k_init;
-            for(i_in=i_init;i_in<i_end;i_in++){
-              asArray[i][k].invPath.push_back(asArray[i_in][k_in].massDensity);
-              asArray[i_in][k_in].drawPath=1;
-              error+=delta_error;
-              if(error>=0.5){
-                k_in--;
-                error-=1.;
-              }
-            }
-          }
-          else{
-            float error = 1./delta_error+0.5;
-            i_in = i_init;
-            for(k_in=k_init;k_in>k_end;k_in--){
-              asArray[i][k].invPath.push_back(asArray[i_in][k_in].massDensity);
-              asArray[i_in][k_in].drawPath=1;
-              error+=1./delta_error;
-              if(error>=0.5){
-                i_in++;
-                error-=1.;
-              }
+          if(asArray[i][k].isSE){
+            double z, x;
+            z=asArray[i][k].z;
+            x=asArray[i][k].x;
+            vector<double> path;
+            float path_len = get_r(R_earth-z,x );
+            float element_num = roundf(path_len/path_resolution);
+            asArray[i][k].pathLen=element_num;
+            path.reserve(element_num);
+            double t=0;
+            while(t<path_len/300000){
+              asArray[i][k].path.push_back(density_polynomials(get_r(the_r(x, z, t, 'x'), the_r(x, z, t, 'y'))));
+              t+=path_resolution/300000;
             }
           }
         }
@@ -345,9 +376,9 @@ int main(int argc, char const *argv[]) {
   earth->initialize("two_layer", "cosmo");
 //  cout << earth->totalMass << endl;
 
-  for(int i =0 ; i<N/2;i++){
-    for(int k = 0;k<N;k++){
-      cout << earth->asArray[i][k].drawPath  << ',' ;
+  for(int k=0;k<N;k++){
+    for(int i =0 ; i<N/2;i++){
+      cout << earth->asArray[i][k].neutrinosProduced  << ',' ;
       }
       cout << 0 << endl;
     }
