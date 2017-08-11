@@ -127,7 +127,11 @@ class RingNode{
     double neutrinosProduced;
     double neutrinosProducedU;
     double neutrinosProducedTh;
+    double slope;
     vector<double> path;
+    bool drawPath;
+    vector<double> invPath;
+
 };
 
 class Planet{
@@ -141,11 +145,15 @@ class Planet{
     void initializeCoords(){
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
+          asArray[i][k].drawPath=0;
           asArray[i][k].x=i*dx;
           asArray[i][k].z=-6371. + k*dz;
           double r = asArray[i][k].getRadius();
           if(r<6371){
             asArray[i][k].isEarth=1;
+            float dk=1e3-k;
+            float di=-i;
+            if(i!=0){asArray[i][k].slope = dk/di;}
             if(r>3480){
               asArray[i][k].isSE=1;
               if(r>R_earth-32.5){
@@ -281,9 +289,44 @@ class Planet{
       }
     }
     void initializePaths(){
-      float detector_x = 0;
-      float detector_y = 0;
-      
+      for(int i=0;i<N/2;i++){
+        for(int k=0;k<N;k++){
+          int i_init = 0;
+          int i_end = i;
+          int k_init = 999;
+          int k_end = k;
+          int deltaX = i_end-i_init;
+          int deltaY = k_end - k_init;
+          float delta_error = abs(float(deltaY)/deltaX);
+          int k_in, i_in;
+          if(abs(deltaX)>=abs(deltaY)){
+            float error = delta_error-0.5;
+            k_in = k_init;
+            for(i_in=i_init;i_in<i_end;i_in++){
+              asArray[i][k].invPath.push_back(asArray[i_in][k_in].massDensity);
+              asArray[i_in][k_in].drawPath=1;
+              error+=delta_error;
+              if(error>=0.5){
+                k_in--;
+                error-=1.;
+              }
+            }
+          }
+          else{
+            float error = 1./delta_error+0.5;
+            i_in = i_init;
+            for(k_in=k_init;k_in>k_end;k_in--){
+              asArray[i][k].invPath.push_back(asArray[i_in][k_in].massDensity);
+              asArray[i_in][k_in].drawPath=1;
+              error+=1./delta_error;
+              if(error>=0.5){
+                i_in++;
+                error-=1.;
+              }
+            }
+          }
+        }
+      }
     }
     void initialize(string key, string bse_model){
       initializeCoords();
@@ -291,6 +334,7 @@ class Planet{
       initializeAbundanceCrust();
       initializeAbundanceMantle(key, bse_model);
       initializeFluxes();
+      initializePaths();
     }
 };
 
@@ -303,10 +347,11 @@ int main(int argc, char const *argv[]) {
 
   for(int i =0 ; i<N/2;i++){
     for(int k = 0;k<N;k++){
-      cout << earth->asArray[i][k].neutrinosProducedTh  << ',' ;
+      cout << earth->asArray[i][k].drawPath  << ',' ;
       }
       cout << 0 << endl;
     }
 
+//cout << earth->asArray[200][500].invPath[0] << endl;
   return 0;
 }
