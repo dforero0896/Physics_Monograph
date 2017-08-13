@@ -11,7 +11,8 @@ using namespace std;
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
-const int N = 1000000; //Number of samples
+#include <sys/time.h>
+const int N = 1000; //Number of samples
 const gsl_rng_type *Gen_Type; //Type of random number generator to use.
 gsl_rng *Gen; //The actual generator object.
 gsl_spline *spectrum_spline;
@@ -55,7 +56,7 @@ void split_array(double to_split[4500][2], double to_return[4500], int comp){
 double mh_sampling(double spectrum_array[4500][2], double markov_chain[N]){
   double initial_value = ((4.5-0.0005)*gsl_rng_uniform(Gen)) + 0.0005; //Uniformly random sample in [0.0005, 4.5).
   markov_chain[0] = initial_value;
-  cout << initial_value << endl;
+  //cout << initial_value << endl;
 
   for(int i=0;i<N-1;i++){
     double possible_jump;
@@ -65,26 +66,28 @@ double mh_sampling(double spectrum_array[4500][2], double markov_chain[N]){
     double criteria = gsl_spline_eval(spectrum_spline, possible_jump, acc)/gsl_spline_eval(spectrum_spline, markov_chain[i], acc);
     if(criteria>=1.){
       markov_chain[i+1]=possible_jump;
-      cout << possible_jump << endl;
+    //  cout << possible_jump << endl;
     }
     else{
       double other_random = gsl_rng_uniform(Gen);
       if(other_random<=criteria){
         markov_chain[i+1]=possible_jump;
-        cout << possible_jump << endl;
+      //  cout << possible_jump << endl;
       }
       else{
         markov_chain[i+1]=markov_chain[i];
-        cout << markov_chain[i] << endl;
+        //cout << markov_chain[i] << endl;
       }
     }
   }
 }
 int main(int argc, char const *argv[]) {
+  struct timeval time;
+  gettimeofday(&time,NULL);
   double U_238[4500][2];
-  string test_file="../AntineutrinoSpectrum_all/AntineutrinoSpectrum_238U.knt";
+  string test_file="../Models/AntineutrinoSpectrum_all/AntineutrinoSpectrum_40K.knt";
   read_file_into_2D_array(test_file, U_238);
-  unsigned long int seed = time(NULL);
+  unsigned long int seed = (time.tv_sec * 1000) + (time.tv_usec / 1000);
   gsl_rng_env_setup(); //Setup environment variables.
   Gen_Type = gsl_rng_taus; //The fastest random number generator.
   Gen = gsl_rng_alloc(Gen_Type); //Allocate necessary memory, initialize generator object.
@@ -99,6 +102,8 @@ int main(int argc, char const *argv[]) {
   mh_sampling(U_238, rand_sampl);
   gsl_rng_free(Gen);
 
-
+  for(int n = 0; n<N;n++){
+    cout << rand_sampl[n] << endl;
+  }
   return 0;
 }

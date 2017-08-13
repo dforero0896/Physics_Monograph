@@ -19,15 +19,15 @@ for i in range(3):
 plt.gcf()
 plt.savefig('probPlot.png')
 
-
+'''
 energyData=np.loadtxt('allowed_energies.csv', dtype=float)
 enerfig=plt.figure()
-plt.hist(energyData, bins=100, normed=True)
+plt.hist(energyData, bins=10, normed=True)
 ax=plt.gca()
 ax.set_yscale('log')
 plt.gcf()
 plt.savefig('allowed_energies_hist.png')
-'''
+
 
 earth_model=np.loadtxt('earth_simul_plots.csv', delimiter=',', dtype=float)
 earthplot=plt.figure(figsize=(12, 15))
@@ -36,7 +36,7 @@ ax=plt.gca()
 ax.set_xlabel('x', fontsize=25)
 ax.set_ylabel('z', fontsize=25)
 cb=earthplot.colorbar(ax.imshow(earth_model))
-plt.scatter(0, 1000, s=100, color='k', label='Detector')
+plt.scatter(0, len(earth_model[:,0]), s=100, color='k', label='Detector')
 plt.legend(loc=3, fontsize=25)
 ax.tick_params(axis='both', which='major', labelsize=25)
 cb.ax.tick_params(labelsize=25)
