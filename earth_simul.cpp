@@ -14,7 +14,7 @@ using namespace std;
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <sys/time.h>
-
+#include "omp.h"
 
 
 const int N = 1000;
@@ -69,38 +69,50 @@ void split_array(double to_split[4500][2], double to_return[4500], int comp){
     to_return[k]=to_split[k][comp];
   }
 }
-vector<double> mh_sampling(double spectrum_array[4500][2], int len){
-  vector<double> markov_chain;
-  markov_chain.reserve(len);
+double *mh_sampling(double spectrum_array[4500][2], int len){
+  double *markov_chain = new double[len];
   double initial_value = ((4.3-0.0005)*gsl_rng_uniform(Gen)) + 0.0005; //Uniformly random sample in [0.0005, 4.5).
-  markov_chain.push_back(initial_value);
+  markov_chain[0]=initial_value;
   //cout << initial_value << endl;
 
-  for(int m=0;m<len;m++){
+  for(int m=0;m<len-1;m++){
     double possible_jump;
     do {
       possible_jump = gsl_ran_gaussian(Gen, 0.1) + markov_chain[m];
     } while(possible_jump <= 0.0005 || possible_jump>=4.5);
     double criteria = gsl_spline_eval(spectrum_spline, possible_jump, acc)/gsl_spline_eval(spectrum_spline, markov_chain[m], acc);
     if(criteria>=1.){
-      markov_chain.push_back(possible_jump);
+      markov_chain[m+1]=possible_jump;
     //  cout << possible_jump << endl;
     }
     else{
       double other_random = gsl_rng_uniform(Gen);
       if(other_random<=criteria){
-        markov_chain.push_back(possible_jump);
+        markov_chain[m+1]=possible_jump;
       //  cout << possible_jump << endl;
       }
       else{
-        markov_chain.push_back(markov_chain[m]);
+        markov_chain[m+1]=markov_chain[m];
         //cout << markov_chain[i] << endl;
       }
     }
   }
   return markov_chain;
 }
-
+float *retrieve_energies(string filename){
+  ifstream energy_repo(filename.c_str());
+  float *energy_repo_arr = new float[10000000];
+  string value_str;
+  int ind=0;
+  while (energy_repo >> value_str && ind <10000000){
+    istringstream value_ss(value_str);
+    float value_num;
+    value_ss >> value_num;
+    energy_repo_arr[ind]=value_num;
+    ind++;
+  }
+  return energy_repo_arr;
+}
 vector<float> linspace(float min, float max, int arraylen){
   vector<float> array;
   array.reserve(arraylen);
@@ -263,7 +275,8 @@ class RingNode{
     vector<float> path;
     float pathLen;
     float distanceToDetector;
-    vector<double> allowedEnergies;
+    float *allowedEnergiesTh;
+    float *allowedEnergiesU;
 
 
 };
@@ -275,7 +288,7 @@ class Planet{
     float crustMass;
     float mantleMass;
     float totalFlux;
-
+    int totalNeut;
     void initializeCoords(){
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
@@ -319,6 +332,7 @@ class Planet{
       gsl_spline *spline = gsl_spline_alloc(gsl_interp_steffen, PREM_len);
       gsl_spline_init(spline, radiusArray, densityArray, PREM_len);
       */
+
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
           if(asArray[i][k].isEarth){
@@ -418,9 +432,10 @@ class Planet{
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){
           asArray[i][k].relativeNeutrino=asArray[i][k].neutrinoFlux/totalFlux;
-          asArray[i][k].neutrinosProduced=  asArray[i][k].relativeNeutrino*totalNeutrinos;
-          asArray[i][k].neutrinosProducedU=asArray[i][k].neutrinosProduced*asArray[i][k].relativeNeutrinoU;
-          asArray[i][k].neutrinosProducedTh=asArray[i][k].neutrinosProduced*asArray[i][k].relativeNeutrinoTh;
+          asArray[i][k].neutrinosProduced=  roundf(asArray[i][k].relativeNeutrino*totalNeutrinos);
+          asArray[i][k].neutrinosProducedU=roundf(asArray[i][k].neutrinosProduced*asArray[i][k].relativeNeutrinoU);
+          asArray[i][k].neutrinosProducedTh=roundf(asArray[i][k].neutrinosProduced*asArray[i][k].relativeNeutrinoTh);
+          totalNeut+=asArray[i][k].neutrinosProduced;
         }
       }
     }
@@ -448,9 +463,34 @@ class Planet{
         }
       }
     }
-    void initializeEnergySamples(string isotope){
+    void initializeEnergySamples(){
+      float *uran_energy_repo;
+      float *thor_energy_repo;
+      uran_energy_repo = retrieve_energies("energy_repo_238U.knt");
+      thor_energy_repo = retrieve_energies("energy_repo_232Th.knt");
+      int uran_i=0;
+      int thor_i=0;
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){
+          if(asArray[i][k].isSE){
+            int U_len = int(asArray[i][k].neutrinosProducedU);
+            for(int n=0;n<U_len;n++){
+              asArray[i][k].allowedEnergiesU=new float[U_len];
+              asArray[i][k].allowedEnergiesU[n]=uran_energy_repo[uran_i++];
+            }
+            int Th_len = int(asArray[i][k].neutrinosProducedTh);
+            for(int m=0;m<Th_len;m++){
+              asArray[i][k].allowedEnergiesTh=new float[Th_len];
+              asArray[i][k].allowedEnergiesTh[m]=thor_energy_repo[thor_i++];
+            }
+
+          }
+          /*
+          gsl_rng_env_setup(); //Setup environment variables.
+          Gen_Type = gsl_rng_taus; //The fastest random number generator.
+          Gen = gsl_rng_alloc(Gen_Type); //Allocate necessary memory, initialize generator object.
+          acc = gsl_interp_accel_alloc(); //Allocate memory for interṕolation acceleration.
+
           string file;
           int num_neut;
           if(isotope == "238U"){
@@ -467,31 +507,39 @@ class Planet{
           double isot_spectrum[4500][2];
           read_file_into_2D_array(file, isot_spectrum);
           unsigned long int seed = (time.tv_sec * 1000) + (time.tv_usec / 1000)+i+k;
-          gsl_rng_env_setup(); //Setup environment variables.
-          Gen_Type = gsl_rng_taus; //The fastest random number generator.
-          Gen = gsl_rng_alloc(Gen_Type); //Allocate necessary memory, initialize generator object.
           gsl_rng_set(Gen, seed); //Seed the generator
-          acc = gsl_interp_accel_alloc(); //Allocate memory for interṕolation acceleration.
           spectrum_spline = gsl_spline_alloc(gsl_interp_cspline, 4500); //Allocate memory for spline object for cubic spline in array of length 4500.
           double x_arr[4500], y_arr[4500];
           split_array(isot_spectrum, x_arr, 0);
           split_array(isot_spectrum, y_arr, 1);
           gsl_spline_init(spectrum_spline, x_arr, y_arr, 4500); //Initialize spline object.
-          vector<double> rand_sampl;
+          double *rand_sampl;
           rand_sampl = mh_sampling(isot_spectrum, int(asArray[i][k].pathLen));
-          asArray[i][k].allowedEnergies=rand_sampl;
-          gsl_rng_free(Gen);
+          if(isotope == "238U"){
+            asArray[i][k].allowedEnergiesU=rand_sampl;
+          }
+          else if(isotope == "232Th"){
+            asArray[i][k].allowedEnergiesTh=rand_sampl;
+
+          }
         }
+        }
+        gsl_rng_free(Gen);*/
         }
       }
+    }
 
     void initialize(string key, string bse_model){
       initializeCoords();
       initializeDensity();
+      initializeAbundanceCrust();
+      initializeAbundanceMantle(key, bse_model);
       initializeFluxes();
       initializePaths();
-      initializeEnergySamples("232Th");
+      initializeEnergySamples();
     }
+
+
 };
 
 
@@ -499,16 +547,17 @@ int main(int argc, char const *argv[]) {
   Planet *earth = new Planet();
 
   earth->initialize("two_layer", "geodyn");
-//  cout << earth->totalMass << endl;
-
+  cout << earth->totalNeut << endl;
+  ofstream outfile;
+  outfile.open("earth_simul_plots.csv");
   for(int k=0;k<N;k++){
     for(int i =0 ; i<N/2;i++){
-      cout << earth->asArray[i][k].distanceToDetector  << ',' ;
+      outfile << earth->asArray[i][k].neutrinoFlux << ',' ;
       }
-      cout << 0 << endl;
+      outfile << 0 << endl;
     }
+  outfile.close();
 
   delete earth;
-//cout << earth->asArray[200][500].invPath[0] << endl;
   return 0;
 }

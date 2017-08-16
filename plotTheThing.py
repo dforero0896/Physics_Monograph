@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-'''
+
 probData=np.loadtxt('probsTest.csv', delimiter=',', dtype=float)
 probabilities, ax = plt.subplots(1, 3, figsize=(30, 10))
 ax[0].plot(probData[:,0], probData[:,1])
@@ -19,10 +19,12 @@ for i in range(3):
 plt.gcf()
 plt.savefig('probPlot.png')
 
-'''
-energyData=np.loadtxt('allowed_energies.csv', dtype=float)
+
+energyData=np.loadtxt('energy_repo_238U.knt', dtype=float)
+energyData2=np.loadtxt('energy_repo_232Th.knt', dtype=float)
 enerfig=plt.figure()
-plt.hist(energyData, bins=10, normed=True)
+plt.hist(energyData, bins=100, normed=True, histtype="step")
+plt.hist(energyData2, bins=100, normed=True, histtype="step")
 ax=plt.gca()
 ax.set_yscale('log')
 plt.gcf()
@@ -43,4 +45,3 @@ cb.ax.tick_params(labelsize=25)
 ax.invert_yaxis()
 plt.gcf()
 plt.savefig('earth_test.png', transparecy=True)
-
