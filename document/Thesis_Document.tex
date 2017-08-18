@@ -18,6 +18,8 @@
 \usepackage{tikz}
 \usepackage{float}
 \usepackage{amsmath}
+\usepackage{makeidx}
+\makeindex
 
 \usepackage[compat=1.1.0]{tikz-feynman}
 
@@ -112,12 +114,40 @@
 	\chapter{Relevance of the Study}
 	
 	\chapter{Distribution of Radioactive Elements}
-
+	
+	\section{Distribution of Elements}
+	A first, basic approach to understanding the distribution of elements in the Earth was given by Goldschmidt \cite{Goldschmidt1958}, who developed a classification \index{Goldschmidt!classification} system for the chemical elements. This classification is, in a nutshell, \textit{lithophile} or oxygen-loving elements tend to remain in the uppermost part of the solid planet; \textit{siderophile} or iron-loving elements, tend to be close to the nucleus and are not atracted to oxygen, such as the lithophiles. The \textit{chalcophile} elements are sulfur-loving and, thus, do not like the deep Earth. Finally, the \textit{atmophile} elements are those who like to be in the atmosphere.\\
+	
+	There are many radioactive isotopes in the Earth, which are, basically, atoms so heavy that they are unstable, and go through diferent processes to reach a more stable state. This will be the topic of chapter \ref{ch:radioactivity}. Most of these heavy elements are classified as lithophiles. We are particularly interested in some isotopes that dominate the geoneutrino production (99\% of production) \cite{Ludhova2013}, these are $^{40}K$, $^{235}U$, $^{238}U$ and $^{232}Th$.\\
+	
+	Within each of the groups given by Goldschmidt and briefly described here, there is other classification that discriminates elements based on their condensation temperature. The elements with  a high value of this parameter are called \textit{refractory} while the ones with a lower one are called \textit{volatile}. Let us then picture the scenario of the formation of the Earth. About $4500Gyr$ ago, the solar system and the Earth were being formed, the latter through planetary accretion or the collision and fusion of planetesimals. This is a hot, undifferentiated mass of molten rock that is slowly cooling down, this causes, first of all, density differentiation, that causes the heavier elements to accumulate near the center of mass, this is the nucleus. It also causes the elements to condense, so the refractory ones, are quickly trapped into the Earth, making it possible to infer the initial abundances of these elements in the primitive Earth, by looking at their abundances in different meteorites. On the other hand, volatile elements will not be trapped so easily or quickly, instead, there is a possibility that these elements have escaped the primitive Earth while it was hotter; the gases are extremely volatile, while the potassium is moderately volatile.\\
+	
+	I have mentioned that the cooling down of the primitive Earth, lead to density differentiation in layers, causing the layered structure of the planet. The less-dense melt that ascended all the way up made up the crust, and is enriched in lithophile elements such as $U$, $Th$, $K$. Nevertheless, there is still an abundance of these elements in the mantle.
 	\section{Relative Abundances}
-	\chapter{Radioactivity}
+	This section is devoted to discuss the different views on the distribution of the radioactive isotopes, quantitatively. There are two main discussions to be considered; first, the average composition of the Bulk Silicate Earth (BSE) and, second, the distribution of Heat Producing Elements (HPE) in the mantle.\\
+	
+	\subsection{Bulk Silicate Earth}
+	
+	In the first place, we shall define the BSE as the ``average'' Earth composition when excluding the nucleus, in other words, an average between mantle and crust. Three main ideas on the BSE composition have arose through the years and each one of them relies in different, valid, arguments.\\
+	
+	The first model is the \textit{geochemical} \index{Bulk Silicate Earth (BSE)!geochemical}, that as the name suggests, is based in geochemical arguments to give values to the abundances and abundance ratios of elements in the planet. McDonough \cite{McDonoughWilliamF;Sun1995} analyzed peridotite samples in order to infer the BSE average compositions. Reference \cite{McDonoughWilliamF;Sun1995} reports values of $A_{Th}^{BSE}=79.5ppb$, $A_{K}^{BSE}=240ppm$ and $A_U^{BSE}=20.3ppb$, while reference \cite{Sramek2013} reports $A_{Th}^{BSE}=80\pm 13ppb$, $A_{K}^{BSE}=280\pm60ppm$ and $A_U^{BSE}=20\pm4ppb$ for this BSE model, note that both references are in agreement. $A_X^Y$ stands for the abundance of element $X$ in reservoir $Y$.\\
+	
+	The second model is the \textit{geodynamical}.\index{Bulk Silicate Earth (BSE)!geodynamical} This model is based on the current measurements of the Earth's heat flow and assumes that the fraction of this heat due to radioactive decay is higher than the fraction due to secular cooling of the planet. In reference \cite{Sramek2013}, the reported values of the abundances are $A_{Th}^{BSE}=140\pm14ppb$, $A_{K}^{BSE}=350\pm35ppm$ and $A_U^{BSE}=35\pm4ppb$. This model has particularly high values of $A_X^Y$ due to the assumption that the majority of the flux is product of radioactivity.\\
+	
+	The third and final model is the \textit{cosmochemical}\index{Bulk Silicate Earth (BSE)!cosmochemical}. It relies on the analysis of enstatite chondrites to infer the BSE composition, under the argument that this abundances specially the iron one, will easily explain the presence of the core, as explained in reference \cite{Ludhova2013}. Reference \cite{Sramek2013} reports the following values relevant to this project: $A_{Th}^{BSE}=43\pm4ppb$, $A_{K}^{BSE}=146\pm29ppm$ and $A_U^{BSE}=12\pm2ppb$.
+	
+	\subsection{Crust}
+	
+	Things said on \cite{Huang2013}
+	
+	\subsection{Mantle}
+	
+	Mass balance thing
+	
+	\chapter{Radioactivity, \label{ch:radioactivity}}
 	\section{Overview}
-	Radioactivity is the phenomenon in which a parent isotope turn into a daughter isotope, with different characteristics, through the emmission of a particle.\\
-	The history of radioactivity goes back to 1896, when H. Becquerel discovered that a uranium sample emmited some kind of penetrating radiation similar to the X rays (discovered earlier that year). In the following years, three different types of emissions were identified: alpha ($\alpha$), beta ($\beta$) and gamma ($ \gamma$). The nature of each of these emissions was identified through the years, concluding that $\alpha$-particles correspond to $^4He$ nuclei, $\beta^\pm$-particles correspond to $e^\pm$ (electrons or positrons) and $\gamma$-particles are nothing but high energy photons.\\
+	Radioactivity is the phenomenon in which a parent isotope turn into a daughter isotope, with different characteristics, through the emission of a particle.\\
+	The history of radioactivity goes back to 1896, when H. Becquerel discovered that a uranium sample emitted some kind of penetrating radiation similar to the X rays (discovered earlier that year). In the following years, three different types of emissions were identified: alpha ($\alpha$), beta ($\beta$) and gamma ($ \gamma$). The nature of each of these emissions was identified through the years, concluding that $\alpha$-particles correspond to $^4He$ nuclei, $\beta^\pm$-particles correspond to $e^\pm$ (electrons or positrons) and $\gamma$-particles are nothing but high energy photons.\\
 	Rutherford discovered that radioactive phenomena was linked directly with the nucleus ($\sim 1 fm$) of a given isotope, thus, it is an entirely quantum phenomenon.\\
 	The overall radioactive phenomena are described by a rather simple mathematical approach given the statistical behavior of the phenomena (which is a result, and evidence of how ``quantum''it is). Given $N$ parent isotopes in a sample at a given time $t$ and assuming no more are added, the rate of decay ($dN/dt$) is proportional to $N$ \cite{Krane1988} 
 	\begin{equation}
@@ -143,7 +173,7 @@
 	Gamma decay is similar to the common electromagnetic emission due to atomic transitions, in fact, it is produced when a metastable state of an isotope decays into a more stable state through the emission of high energy photons. It should be noted that, in this case, no change in $A$ or $N$ is produced. These metastable states are common daughter isotopes to $\alpha$ and $\beta$ decays.\\
 	Lifetimes for this kind of process is generally short, taking only fractions of a second to decay while some $\alpha$-decaying isotopes may have half-lives of the order of $10^3yr$.
 	\subsection{Beta decay}
-	This type of decay can be considered to be more complex than the other two, as it responds to more complicated undelying physics: the weak interaction. It consists in a set of semileptonic processes (that involve both leptons and hadrons) that will be described below.
+	This type of decay can be considered to be more complex than the other two, as it responds to more complicated underlying physics: the weak interaction. It consists in a set of semileptonic processes (that involve both leptons and hadrons) that will be described below.
 	\begin{itemize}
 		\item \textbf{Positive Beta decay:} 
 		\begin{equation}
@@ -196,7 +226,7 @@ p + e^- \rightarrow n + \nu_e
 	\end{figure}
 	\end{itemize}
 	Note that in all these processes new particles are created in the nucleus, which is a consequence of the weak interaction that rules them.\\
-	The particles labelled with $\nu_e$ are electron neutrinos and were proposed by Pauli in order to solve the conundrum concerning the apparently continuous energy spectra of $\beta$-decay which is against the core of quantum mechanics, the inclusion of these particles in the energy spectrum of the decay made it discrete, thus, giving a solution to the problem.\\
+	The particles labeled with $\nu_e$ are electron neutrinos and were proposed by Pauli in order to solve the conundrum concerning the apparently continuous energy spectra of $\beta$-decay which is against the core of quantum mechanics, the inclusion of these particles in the energy spectrum of the decay made it discrete, thus, giving a solution to the problem.\\
 	For this project, we are strictly interested in the $\beta^-$-decay since it is the one that produces antineutrinos.
 
 
@@ -209,14 +239,14 @@ p + e^- \rightarrow n + \nu_e
 	\section{(Anti)Neutrino emission}
 	\chapter{Neutrino Physics}
 	\normalsize
-	This chapter is only an overview of the special physics that surrounds these particles, for a thorough explanation you should see reference \cite{Giunti2010} and for details on time evolution reference \cite{Ohlsson2001}.\\
-	Neutrinos are neutral leptons that interact weakly and are always produced in a given  flavor eigenstate $|\nu_\alpha\rangle$ with $\alpha = e, \mu, \tau$. In equations \ref{eq:betaplus} to \ref{eq:electroncapture}, all neutrinos are labelled $\nu_e$ that stands for electron neutrino, this is because they are all associated with the ``ordinary'' matter which is composed by electrons, not tauons or muons.\\
-	So, neutrinos are produced in flavor states, but these are not mass (energy) eigenstates and, since the hamiltonian entirely controls the time evolution of a quantum system, the neutrinos will not evolve (travel) in these states but will rather oscillate between the real mass eigenstates which, as the name suggests, do have a definite (and unknown) mass, while flavor states are just a linear combination of them. This may be written as
+	This chapter is only an overview of the special physics that surrounds these particles, for a thorough explanation you should see reference \cite{Giunti2010} and for details on time evolution, reference \cite{Ohlsson2001}.\\
+	Neutrinos \index{Neutrino!definition} are neutral leptons that interact weakly and are always produced in a given  flavor eigenstate \index{Eigenstate!flavor} $|\nu_\alpha\rangle$ with $\alpha = e, \mu, \tau$. In equations \ref{eq:betaplus} to \ref{eq:electroncapture}, all neutrinos are labeled $\nu_e$ that stands for electron neutrino, this is because they are all associated with the ``ordinary'' matter which is composed by electrons, not tauons or muons.\\
+	I just mentioned neutrinos are produced in flavor states, but these are not mass (energy) eigenstates \index{Eigenstate!mass} and, since the Hamiltonian \index{Hamiltonian}  entirely controls the time evolution of a quantum system, the neutrinos will not evolve (travel) in these states but will rather oscillate between the real mass eigenstates which, as the name suggests, do have a definite (and unknown) mass, while flavor states are just a linear combination of them. This may be written as
 	\begin{equation}
 	|\nu_\alpha\rangle =\sum_{a=1}^{3} U^*_{\alpha a}|\nu_a\rangle
 	\label{eq:tansform}
 	\end{equation}
-	Here, we have labelled $|\nu_a\rangle$ the mass eigenstates, with $a=1, 2, 3$. $U^*_{\alpha a}$ is the matrix element of the transformation matrix $U^*$ \cite{Ohlsson2001}.\\
+	Here, we have labeled $|\nu_a\rangle$ the mass eigenstates, with $a=1, 2, 3$. $U^*_{\alpha a}$ is the matrix element of the transformation matrix $U^*$ \cite{Ohlsson2001}.\\
 	The matrix $U^*$ is the complex conjugate of matrix $U$, called Pontecorvo–Maki–Nakagawa–Sakata (PMNS) matrix, that rules the mixing of the neutrinos and can be parametrized as shown in \cite{Ohlsson2001}
 	\begin{equation}
 U=	\begin{bmatrix}
@@ -228,7 +258,7 @@ U=	\begin{bmatrix}
 	
 	Where $S_i\equiv\sin(\theta_i)$ and $C_i\equiv\cos(\theta_i)$. $\theta_i$ are the vacuum mixing angles. Here we have assumed there is no charge-parity (CP) phase, thus, $U=U^*$.
 	\section{Time evolution}
-	According to the principles of quantum mechanics, the hamiltonian of a system described by the ket $|\psi\rangle$ does define its time evolution according to
+	According to the principles of quantum mechanics, the Hamiltonian of a system described by the ket $|\psi\rangle$ does define its time evolution according to
 	\begin{equation}
 	|\psi(t)\rangle = \exp(-i\hat{H}(t-t_0))|\psi(t_0)\rangle
 	\label{eq:gentimeevol}
@@ -238,7 +268,7 @@ U=	\begin{bmatrix}
 	|\nu_a(t)\rangle = \exp(-\hat{H}_m(t-t_0))|\nu_a(t_0)\rangle
 	\label{eq:timeevol}
 	\end{equation}
-	In this base, the hamiltonian will be diagonal
+	In this base, the Hamiltonian will be diagonal
 		\begin{equation}
 		\hat{H}_{m, unperturbed}= \begin{bmatrix}
 		E_1 & 0 & 0  \\
@@ -247,7 +277,7 @@ U=	\begin{bmatrix}
 		\end{bmatrix}
 		\label{eq:unphammass}
 		\end{equation}
-	In matter, the hamiltonian of the system is perturbed in the following way
+	In matter, the Hamiltonian of the system is perturbed in the following way
 	\begin{equation}
 	\hat{V}_f= A	\begin{bmatrix}
 	1 & 0 & 0  \\
@@ -263,7 +293,7 @@ U=	\begin{bmatrix}
 	\end{equation}
 	Here, $G_F$ is the Fermi coupling constant, $\rho(r)$ is the matter density and $m_N$ is the nucleon mass.\\
 	
-	The perturbation $V_f$ ($f$ stands for flavor base) only affects electron-flavored neutrinos because matter, as we see it, is electronic. Taking this into account, the perturbed hamiltonian, in mass basis is
+	The perturbation $V_f$ ($f$ stands for flavor base) only affects electron-flavored neutrinos because matter, as we see it, is electronic. Taking this into account, the perturbed Hamiltonian, in mass basis is
 		\begin{equation}
 		\hat{H}_{m}= \begin{bmatrix}
 		E_1 & 0 & 0  \\
@@ -288,6 +318,7 @@ U=	\begin{bmatrix}
 	\bibliographystyle{unsrt}
 	\bibliography{refs}
 		
+	\printindex
 		
 	
 \end{document}

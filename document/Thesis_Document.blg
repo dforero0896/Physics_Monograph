@@ -3,44 +3,49 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: Thesis_Document.aux
 The style file: unsrt.bst
 Database file #1: refs.bib
-You've used 3 entries,
+Repeated entry---line 137 of file refs.bib
+ : @book{Goldschmidt1958
+ :                      ,
+I'm skipping whatever remains of this entry
+You've used 8 entries,
             1791 wiz_defined-function locations,
-            466 strings with 3939 characters,
-and the built_in function-call counts, 679 in all, are:
-= -- 64
-> -- 20
+            501 strings with 4823 characters,
+and the built_in function-call counts, 1785 in all, are:
+= -- 164
+> -- 73
 < -- 1
-+ -- 8
-- -- 5
-* -- 38
-:= -- 108
-add.period$ -- 9
-call.type$ -- 3
-change.case$ -- 2
++ -- 28
+- -- 20
+* -- 116
+:= -- 291
+add.period$ -- 24
+call.type$ -- 8
+change.case$ -- 7
 chr.to.int$ -- 0
-cite$ -- 3
-duplicate$ -- 33
-empty$ -- 69
-format.name$ -- 5
-if$ -- 153
+cite$ -- 8
+duplicate$ -- 78
+empty$ -- 174
+format.name$ -- 20
+if$ -- 391
 int.to.chr$ -- 0
-int.to.str$ -- 3
-missing$ -- 4
-newline$ -- 18
-num.names$ -- 3
-pop$ -- 11
+int.to.str$ -- 8
+missing$ -- 10
+newline$ -- 43
+num.names$ -- 8
+pop$ -- 21
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 16
+skip$ -- 32
 stack$ -- 0
-substring$ -- 47
-swap$ -- 8
+substring$ -- 128
+swap$ -- 13
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 0
-while$ -- 8
-width$ -- 4
-write$ -- 34
+while$ -- 19
+width$ -- 9
+write$ -- 89
+(There was 1 error message)
