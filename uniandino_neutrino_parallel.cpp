@@ -310,7 +310,7 @@ gsl_matrix_complex calculateOperator(double neutrinoEnergy, double A, double L){
   //print_complex_matrix(evol_operator);
   return *evol_operator;
 }
-int main(int argc, char const *argv[]) {
+void calculateProbabilities(){
 	int threads =4;
   //CKM matrix elements calculated just once.
 	double theta1=deg2rad(thetaA);
@@ -343,7 +343,7 @@ int main(int argc, char const *argv[]) {
 	for(int i=0;i<N;i++){
 		EnergyLins[i]=pow(10, exps[i]);
 	}
-	vector<double> DensityStep = density_array_from_key("fig_1", Steps);
+	vector<double> DensityStep = density_array_from_key("sun", Steps);
 	omp_set_num_threads(threads);
 	int i,k;
 	double Probabilities[N][3];
@@ -359,9 +359,9 @@ int main(int argc, char const *argv[]) {
 		#pragma omp parallel for private(k)
 	  for(k=0;k<Steps;k++){
 	    double density=DensityStep[k];
-			double len = (2885.+6972.)/Steps; //When figure 1 is plotted
+			//double len = (2885.+6972.)/Steps; //When figure 1 is plotted
 			//double len = 12742./Steps; //When figure 4 or 6 are plotted
-			//double len = 6.96e5/Steps; //When sun thing is plotted
+			double len = 6.96e5/Steps; //When sun thing is plotted
 	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
 	    *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
 	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
@@ -383,5 +383,9 @@ int main(int argc, char const *argv[]) {
 		//cout << EnergyLins[i] << "," << Probabilities[i] << endl;
 	}
 
-  return 0;
+
+}
+int main(int argc, char const *argv[]) {
+		calculateProbabilities();
+	  return 0;
 }
