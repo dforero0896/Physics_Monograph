@@ -464,7 +464,7 @@ void calculateProbabilitiesFunctionEnergy(int steps, vector<float> path){
   generate_real_identity(Id);
   copy_to_complex_from_real(Id, operator_product);
   int NN=10000;
-	vector<float> EnergyLins=linspace(500, 5000, NN);
+	vector<float> EnergyLins=linspace(500, 5000000, NN);
   omp_set_num_threads(threads);
 	int i,k;
 	double Probabilities[NN][3];
@@ -585,10 +585,6 @@ float calculateProbability(int steps, vector<float> path, float energy){
   copy_to_complex_from_real(Id, operator_product);
   omp_set_num_threads(threads);
 	int i,k;
-	double Probabilities[N][3];
-	//double Probabilities[N];
-	generate_real_identity(Id);
-	copy_to_complex_from_real(Id, operator_product);
 	#pragma omp parallel for private(k)
 	for(k=0;k<steps;k++){
 	    double density=double(path[k]);
@@ -601,8 +597,9 @@ float calculateProbability(int steps, vector<float> path, float energy){
 	    gsl_matrix_complex_free(operator_product_copy);
 	    gsl_matrix_complex_free(iter_operator);
 	  }
-
-    return float(gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0)));
+    float prob = float(gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0)));
+    gsl_matrix_complex_free(operator_product);
+    return prob;
 
 
 }
@@ -839,6 +836,7 @@ class Planet{
       float *thor_energy_repo;
       uran_energy_repo = retrieve_energies("energy_repo_238U.knt");
       thor_energy_repo = retrieve_energies("energy_repo_232Th.knt");
+      cout << thor_energy_repo[9999239] << ',' << uran_energy_repo[9935793] << endl;
       int uran_i=0;
       int thor_i=0;
       for(int i=0;i<N/2;i++){
@@ -847,14 +845,15 @@ class Planet{
             int U_len = int(asArray[i][k].neutrinosProducedU);
             for(int n=0;n<U_len;n++){
               asArray[i][k].allowedEnergiesU=new float[U_len];
-              asArray[i][k].allowedEnergiesU[n]=uran_energy_repo[uran_i++];
+              asArray[i][k].allowedEnergiesU[n]=1000*uran_energy_repo[uran_i];
+              uran_i++;
             }
             int Th_len = int(asArray[i][k].neutrinosProducedTh);
             for(int m=0;m<Th_len;m++){
               asArray[i][k].allowedEnergiesTh=new float[Th_len];
-              asArray[i][k].allowedEnergiesTh[m]=thor_energy_repo[thor_i++];
+              asArray[i][k].allowedEnergiesTh[m]=1000*thor_energy_repo[thor_i];
+              thor_i++;
             }
-
           }
           /*
           gsl_rng_env_setup(); //Setup environment variables.
@@ -899,7 +898,15 @@ class Planet{
         }
       }
     }
+    void simulate(){
+      for(int i=0;i<N/2;i++){
+        for(int k=0;k<N;k++){
+          if(asArray[i][k].isSE){
 
+          }
+        }
+      }
+    }
     void initialize(string key, string bse_model){
       initializeCoords();
       initializeDensity();
@@ -931,7 +938,7 @@ int main(int argc, char const *argv[]) {
 
 int xtest, ytest;
 xtest=100;
-ytest=100;
+ytest=200;
   ofstream test_path_file;
   test_path_file.open("test_path.csv");
   int test_N = int(earth->asArray[xtest][ytest].pathLen);
@@ -939,9 +946,9 @@ ytest=100;
     test_path_file << earth->asArray[xtest][ytest].path[step] << endl;
   }
   test_path_file.close();
-
+  cout << (earth->asArray[xtest][ytest].allowedEnergiesU[0]) << endl;
+  cout << calculateProbability(test_N, earth->asArray[xtest][ytest].path, (earth->asArray[xtest][ytest].allowedEnergiesU[0])) << endl;
   calculateProbabilitiesFunctionEnergy(test_N, earth->asArray[xtest][ytest].path);
-
   delete earth;
   return 0;
 }
