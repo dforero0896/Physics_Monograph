@@ -1,5 +1,6 @@
-//g++ -o earth_simul.o earth_simul.cpp `gsl-config --cflags --libs`
-
+/*
+g++ -fopenmp -o earth_simul.o earth_simul.cpp `gsl-config --cflags --libs`
+*/
 
 #include<iostream>
 #include <fstream>
@@ -81,36 +82,7 @@ void split_array(double to_split[4500][2], double to_return[4500], int comp){
     to_return[k]=to_split[k][comp];
   }
 }
-double *mh_sampling(double spectrum_array[4500][2], int len){
-  double *markov_chain = new double[len];
-  double initial_value = ((4.3-0.0005)*gsl_rng_uniform(Gen)) + 0.0005; //Uniformly random sample in [0.0005, 4.5).
-  markov_chain[0]=initial_value;
-  //cout << initial_value << endl;
 
-  for(int m=0;m<len-1;m++){
-    double possible_jump;
-    do {
-      possible_jump = gsl_ran_gaussian(Gen, 0.1) + markov_chain[m];
-    } while(possible_jump <= 0.0005 || possible_jump>=4.5);
-    double criteria = gsl_spline_eval(spectrum_spline, possible_jump, acc)/gsl_spline_eval(spectrum_spline, markov_chain[m], acc);
-    if(criteria>=1.){
-      markov_chain[m+1]=possible_jump;
-    //  cout << possible_jump << endl;
-    }
-    else{
-      double other_random = gsl_rng_uniform(Gen);
-      if(other_random<=criteria){
-        markov_chain[m+1]=possible_jump;
-      //  cout << possible_jump << endl;
-      }
-      else{
-        markov_chain[m+1]=markov_chain[m];
-        //cout << markov_chain[i] << endl;
-      }
-    }
-  }
-  return markov_chain;
-}
 float *retrieve_energies(string filename){
   ifstream energy_repo(filename.c_str());
   float *energy_repo_arr = new float[10000000];
@@ -197,11 +169,17 @@ vector<float> copy_vector(vector<float> to_copy){
   }
   return copy;
 }
-
+float density_to_potential(float dty, bool antineutrino){
+  float to_return = (1/sqrt(2))*dty*1e-3*8.96189e-47*1e9   /1.672e-27;
+  if(antineutrino){
+    return -1*to_return;
+  }
+  else{
+    return to_return;
+  }
+}
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-/*This program was developed by Daniel Felipe Forero Sánchez
-for the physicist and geoscientist degree at Universidad
-de Los Andes*/
+
 
 //Constants
 //Mass differences
@@ -221,15 +199,6 @@ double longitude_units_conversion(double lon_in_km){
 }
 double deg2rad(double deg){
 	return deg*PI/180.;
-}
-void densityStep ( double *fill , double *dist, int arraysize){
-
-	int i;
-	for(i=0;i<arraysize;i++){
-		if(dist[i] < 2885.){fill[i]=1.7e-13;}
-		else {fill[i] = 4.4e-13;}
-	}
-
 }
 void fill_real_matrix(gsl_matrix *empty, double elem_11, double elem_12, double elem_13, double elem_21, double elem_22, double elem_23, double elem_31, double elem_32, double elem_33){
   gsl_matrix_set(empty, 0, 0, elem_11);
@@ -459,20 +428,17 @@ void calculateProbabilitiesFunctionEnergy(int steps, vector<float> path){
   Ut3=gsl_sf_cos(theta1)*gsl_sf_cos(theta2);
   CKM=gsl_matrix_alloc(3, 3);
   fill_real_matrix(CKM, Ue1, Ue2, Ue3, Umu1, Umu2, Umu3, Ut1, Ut2, Ut3);
-  gsl_matrix *Id =gsl_matrix_alloc(3, 3);
-  gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
-  generate_real_identity(Id);
-  copy_to_complex_from_real(Id, operator_product);
+
   int NN=10000;
-	vector<float> EnergyLins=linspace(500, 5000000, NN);
+	//vector<float> EnergyLins=linspace(500, 5000000, NN);
+  vector<float> EnergyLins=linspace(2, 12, NN);
   omp_set_num_threads(threads);
 	int i,k;
 	double Probabilities[NN][3];
-	//double Probabilities[N];
 	#pragma omp parallel for private(i)
 	for(i=0;i<NN;i++){
-	  //double energy=pow(10,EnergyLins[i]);
-    double energy = EnergyLins[i];
+	  double energy=5*pow(10,EnergyLins[i]);
+    //double energy = EnergyLins[i];
 	  gsl_matrix *Id =gsl_matrix_alloc(3, 3);
 	  gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
 	  generate_real_identity(Id);
@@ -493,6 +459,7 @@ void calculateProbabilitiesFunctionEnergy(int steps, vector<float> path){
 		Probabilities[i][0] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0));
 		Probabilities[i][1] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
 		Probabilities[i][2] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,2));
+    gsl_matrix_complex_free(operator_product);
 		//cout << EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2] << endl;
 
 	}
@@ -500,7 +467,7 @@ void calculateProbabilitiesFunctionEnergy(int steps, vector<float> path){
   prob_path_file.open("prob_path.csv");
 
   for(i=0;i<NN;i++){
-		prob_path_file << EnergyLins[i] << "," << Probabilities[i][0] <<  endl;
+		prob_path_file <<5*pow(10,EnergyLins[i]) << "," << Probabilities[i][0] <<  endl;
 		//cout << EnergyLins[i] << "," << Probabilities[i] << endl;
 	}
   prob_path_file.close();
@@ -561,12 +528,12 @@ void split_array(vector< vector<float> > to_split, float container[PREM_len], in
     }  }
 }
 */
-float calculateProbability(int steps, vector<float> path, float energy){
-	int threads =4;
+float calculateProbability(int steps, vector<float> path, float energy_param){
+  int threads =4;
   //CKM matrix elements calculated just once.
-	double theta1=deg2rad(thetaA);
-	double theta2=deg2rad(thetaB);
-	double theta3=deg2rad(thetaC);
+  double theta1=deg2rad(thetaA);
+  double theta2=deg2rad(thetaB);
+  double theta3=deg2rad(thetaC);
   Ue1 = gsl_sf_cos(theta2)*gsl_sf_cos(theta3);
   Ue2 = gsl_sf_sin(theta3)*gsl_sf_cos(theta2);
   Ue3 = gsl_sf_sin(theta2);
@@ -576,32 +543,41 @@ float calculateProbability(int steps, vector<float> path, float energy){
   Ut1=gsl_sf_sin(theta1)*gsl_sf_sin(theta3)-gsl_sf_sin(theta2)*gsl_sf_cos(theta1)*gsl_sf_cos(theta3);
   Ut2=-gsl_sf_sin(theta1)*gsl_sf_cos(theta3)-gsl_sf_sin(theta2)*gsl_sf_sin(theta3)*gsl_sf_cos(theta1);
   Ut3=gsl_sf_cos(theta1)*gsl_sf_cos(theta2);
-
   CKM=gsl_matrix_alloc(3, 3);
   fill_real_matrix(CKM, Ue1, Ue2, Ue3, Umu1, Umu2, Umu3, Ut1, Ut2, Ut3);
-  gsl_matrix *Id =gsl_matrix_alloc(3, 3);
-  gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
-  generate_real_identity(Id);
-  copy_to_complex_from_real(Id, operator_product);
+
+  int NN=10000;
+  //vector<float> EnergyLins=linspace(500, 5000000, NN);
+  vector<float> EnergyLins=linspace(2, 12, NN);
   omp_set_num_threads(threads);
-	int i,k;
-	#pragma omp parallel for private(k)
-	for(k=0;k<steps;k++){
-	    double density=double(path[k]);
-			double len = double(path_resolution);
-	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
-	    *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
-	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
-	    copy_to_complex_from_complex(operator_product, operator_product_copy);
-	    gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, gsl_complex_rect(1., 0), iter_operator, operator_product_copy, gsl_complex_rect(0., 0.),operator_product);
-	    gsl_matrix_complex_free(operator_product_copy);
-	    gsl_matrix_complex_free(iter_operator);
-	  }
-    float prob = float(gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0)));
+  int i,k;
+  double Probabilities[NN][3];
+i=0;
+    double energy=double(energy_param);
+    //double energy = EnergyLins[i];
+    gsl_matrix *Id =gsl_matrix_alloc(3, 3);
+    gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
+    generate_real_identity(Id);
+    copy_to_complex_from_real(Id, operator_product);
+    for(k=0;k<steps;k++){
+      double density=double(path[k]);
+      double len = double(path_resolution);
+      gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
+      *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
+      gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
+      copy_to_complex_from_complex(operator_product, operator_product_copy);
+      gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, gsl_complex_rect(1., 0), iter_operator, operator_product_copy, gsl_complex_rect(0., 0.),operator_product);
+      gsl_matrix_complex_free(operator_product_copy);
+      gsl_matrix_complex_free(iter_operator);
+    }
+    //Probabilities[i] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
+    Probabilities[i][0] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0));
+    Probabilities[i][1] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
+    Probabilities[i][2] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,2));
     gsl_matrix_complex_free(operator_product);
-    return prob;
+    //cout << EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2] << endl;
 
-
+  return float(Probabilities[0][0]);
 }
 
 class RingNode{
@@ -634,6 +610,9 @@ class RingNode{
     float neutrinoFlux;
     float neutrinoThFlux;
     float neutrinoUFlux;
+    float neutrinoFluxMeasure;
+    float neutrinoThFluxMeasure;
+    float neutrinoUFluxMeasure;
     float relativeNeutrinoTh;
     float relativeNeutrinoU;
     float relativeNeutrino;
@@ -643,8 +622,10 @@ class RingNode{
     vector<float> path;
     float pathLen;
     float distanceToDetector;
-    float *allowedEnergiesTh;
-    float *allowedEnergiesU;
+    vector <float> allowedEnergiesTh;
+    vector <float> allowedEnergiesU;
+    vector <float> probabilitiesTh;
+    vector <float> probabilitiesU;
 
 
 };
@@ -658,6 +639,7 @@ class Planet{
     float totalFlux;
     int totalNeut;
     void initializeCoords(){
+      cout << "Initializing Coordinates" << endl;
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
           asArray[i][k].x=i*dx;
@@ -689,6 +671,7 @@ class Planet{
       }
     }
     void initializeDensity(){
+      cout << "Initializing Density" << endl;
       /*
       vector< vector<float> > PREM_complete;
       PREM_complete = ::import_model("../Models/PREM_1s.csv");
@@ -721,6 +704,7 @@ class Planet{
       //gsl_interp_accel_free(acc);
     }
     void initializeAbundanceCrust(){
+      cout << "Initializing Abundances in the Crust" << endl;
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
           if(asArray[i][k].isCrust){
@@ -735,6 +719,7 @@ class Planet{
       }
     }
     void initializeAbundanceMantle(string key, string bse_model){
+      cout << "Initializing Abundances in the Mantle" << endl;
       int model;
       if(bse_model=="cosmo"){model=0;}
       else if(bse_model=="geoch"){model=1;}
@@ -777,11 +762,12 @@ class Planet{
       }
     }
     void initializeFluxes(){
+      cout << "Initializing Fluxes" << endl;
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){
           if(asArray[i][k].isSE){
-            asArray[i][k].neutrinoUFlux=(asArray[i][k].abundanceU*1e-6)*(asArray[i][k].massDensity*1e3)*(6)*(4.916*1e-18)*(0.9927)/(238.051*1.661e-27)*(asArray[i][k].volume*1e9)*asArray[i][k].solidAngle;
-            asArray[i][k].neutrinoThFlux=(asArray[i][k].abundanceTh*1e-6)*(asArray[i][k].massDensity*1e3)*(4)*(1.563*1e-18)*(1)/(232.038*1.661e-27)*(asArray[i][k].volume*1e9)*asArray[i][k].solidAngle;
+            asArray[i][k].neutrinoUFlux=(asArray[i][k].abundanceU*1e-6)*(asArray[i][k].massDensity*1e3)*(6)*((4.916*1e-18*1e-6)*(0.9927)/(238.051*1.661e-27))*(asArray[i][k].volume*1e15)*asArray[i][k].solidAngle;
+            asArray[i][k].neutrinoThFlux=(asArray[i][k].abundanceTh*1e-6)*(asArray[i][k].massDensity*1e3)*(4)*((1.563*1e-18*1e-6)*(1)/(232.038*1.661e-27))*(asArray[i][k].volume*1e15)*asArray[i][k].solidAngle;
             asArray[i][k].neutrinoFlux=  asArray[i][k].neutrinoUFlux+asArray[i][k].neutrinoThFlux;
             asArray[i][k].relativeNeutrinoU=asArray[i][k].neutrinoUFlux/asArray[i][k].neutrinoFlux;
             asArray[i][k].relativeNeutrinoTh=asArray[i][k].neutrinoThFlux/asArray[i][k].neutrinoFlux;
@@ -807,8 +793,11 @@ class Planet{
       }
     }
     void initializePaths(){
-      for(int i=0;i<N/2;i++){
-        for(int k=0;k<N;k++){
+      cout << "Initializing Potential (density) paths" << endl;
+      omp_set_num_threads(4);
+      int i, k;
+      for(i=0;i<N/2;i++){
+        for(k=0;k<N;k++){
           if(asArray[i][k].isSE){
             float z, x;
             z=asArray[i][k].z;
@@ -824,7 +813,7 @@ class Planet{
             for(int n=0;n<int(element_num);n++){
               float t = times[n];
               float dty = density_polynomials(get_r(the_r(x, z, t, 'x'), the_r(x, z, t, 'z')));
-              path.push_back(-sqrt(2)*dty*1e-3*8.96189e-47*1e9   /1.672e-27); //eV
+              path.push_back(density_to_potential(dty, 1)); //eV
               }
             asArray[i][k].path=path;
           }
@@ -832,82 +821,85 @@ class Planet{
       }
     }
     void initializeEnergySamples(){
+      cout << "Initializing Energies for Neutrinos" << endl;
       float *uran_energy_repo;
       float *thor_energy_repo;
       uran_energy_repo = retrieve_energies("energy_repo_238U.knt");
       thor_energy_repo = retrieve_energies("energy_repo_232Th.knt");
-      cout << thor_energy_repo[9999239] << ',' << uran_energy_repo[9935793] << endl;
+      //cout << thor_energy_repo[9999239] << ',' << uran_energy_repo[9935793] << endl;
       int uran_i=0;
       int thor_i=0;
-      for(int i=0;i<N/2;i++){
-        for(int k=0;k<N;k++){
+      omp_set_num_threads(4);
+      int i, k, n, m;
+      for(i=0;i<N/2;i++){
+        for(k=0;k<N;k++){
           if(asArray[i][k].isSE){
+            vector <float> path_U;
+            vector <float> path_Th;
             int U_len = int(asArray[i][k].neutrinosProducedU);
-            for(int n=0;n<U_len;n++){
-              asArray[i][k].allowedEnergiesU=new float[U_len];
-              asArray[i][k].allowedEnergiesU[n]=1000*uran_energy_repo[uran_i];
-              uran_i++;
+            if (U_len>0){
+              path_U.reserve(U_len);
+              asArray[i][k].allowedEnergiesU.reserve(U_len);
+              for(n=0;n<U_len;n++){
+                asArray[i][k].allowedEnergiesU.push_back(1e6*uran_energy_repo[uran_i]);
+                uran_i++;
+              }
             }
             int Th_len = int(asArray[i][k].neutrinosProducedTh);
-            for(int m=0;m<Th_len;m++){
-              asArray[i][k].allowedEnergiesTh=new float[Th_len];
-              asArray[i][k].allowedEnergiesTh[m]=1000*thor_energy_repo[thor_i];
-              thor_i++;
+            if(Th_len>0){
+              asArray[i][k].allowedEnergiesTh.reserve(Th_len);
+              path_Th.reserve(Th_len);
+              for(m=0;m<Th_len;m++){
+                asArray[i][k].allowedEnergiesTh.push_back(1e6*thor_energy_repo[thor_i]);
+                thor_i++;
+              }
             }
+            asArray[i][k].allowedEnergiesU=path_U;
+            asArray[i][k].allowedEnergiesTh=path_Th;
           }
-          /*
-          gsl_rng_env_setup(); //Setup environment variables.
-          Gen_Type = gsl_rng_taus; //The fastest random number generator.
-          Gen = gsl_rng_alloc(Gen_Type); //Allocate necessary memory, initialize generator object.
-          acc = gsl_interp_accel_alloc(); //Allocate memory for interṕolation acceleration.
-
-          string file;
-          int num_neut;
-          if(isotope == "238U"){
-            file = "../Models/AntineutrinoSpectrum_all/AntineutrinoSpectrum_238U.knt";
-            num_neut = int(roundf(asArray[i][k].neutrinosProducedU));
-          }
-          else if(isotope == "232Th"){
-            file = "../Models/AntineutrinoSpectrum_all/AntineutrinoSpectrum_232Th.knt";
-            num_neut = int(roundf(asArray[i][k].neutrinosProducedTh));
-          }
-
-          struct timeval time;
-          gettimeofday(&time,NULL);
-          double isot_spectrum[4500][2];
-          read_file_into_2D_array(file, isot_spectrum);
-          unsigned long int seed = (time.tv_sec * 1000) + (time.tv_usec / 1000)+i+k;
-          gsl_rng_set(Gen, seed); //Seed the generator
-          spectrum_spline = gsl_spline_alloc(gsl_interp_cspline, 4500); //Allocate memory for spline object for cubic spline in array of length 4500.
-          double x_arr[4500], y_arr[4500];
-          split_array(isot_spectrum, x_arr, 0);
-          split_array(isot_spectrum, y_arr, 1);
-          gsl_spline_init(spectrum_spline, x_arr, y_arr, 4500); //Initialize spline object.
-          double *rand_sampl;
-          rand_sampl = mh_sampling(isot_spectrum, int(asArray[i][k].pathLen));
-          if(isotope == "238U"){
-            asArray[i][k].allowedEnergiesU=rand_sampl;
-          }
-          else if(isotope == "232Th"){
-            asArray[i][k].allowedEnergiesTh=rand_sampl;
-
-          }
-        }
-        }
-        gsl_rng_free(Gen);*/
         }
       }
     }
-    void simulate(){
+    void simulateProbabilities(){
+      cout << "Simulating Oscillations" << endl;
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){
-          if(asArray[i][k].isSE){
+          int U_len = int(asArray[i][k].neutrinosProducedU);
+          int Th_len = int(asArray[i][k].neutrinosProducedTh);
+    //      vector <double> probabilitiesU;
+  //        vector <double> probabilitiesTh;
+          int n, m;
+          if (U_len>0){
+//            probabilitiesU.reserve(U_len);
+            asArray[i][k].probabilitiesU.reserve(U_len);
+            for(n=0;n<U_len;n++){
+              asArray[i][k].probabilitiesU.push_back(calculateProbability(int(asArray[i][k].pathLen), asArray[i][k].path, asArray[i][k].allowedEnergiesU[n]));
+            }
 
           }
+          if(Th_len>0){
+            asArray[i][k].probabilitiesTh.reserve(Th_len);
+      //      probabilitiesTh.reserve(Th_len);
+            for(m=0;m<Th_len;m++){
+              asArray[i][k].probabilitiesTh.push_back(calculateProbability(int(asArray[i][k].pathLen), asArray[i][k].path, asArray[i][k].allowedEnergiesTh[n]));
+            }
+
+          }
+        }
+      }
+    }
+
+    void simulateSignal(){
+      float eff_U = 0.692;
+      float eff_Th = 0.68;
+      for(int i=0;i<N/2;i++){
+        for(int k=0;k<N;k++){
+
         }
       }
     }
     void initialize(string key, string bse_model){
+      cout << "Building Planet" << endl;
       initializeCoords();
       initializeDensity();
       initializeAbundanceCrust();
@@ -915,6 +907,8 @@ class Planet{
       initializeFluxes();
       initializePaths();
       initializeEnergySamples();
+      simulateProbabilities();
+      cout << "Done" << endl;
     }
 
 
@@ -925,7 +919,7 @@ int main(int argc, char const *argv[]) {
   Planet *earth = new Planet();
 
   earth->initialize("two_layer", "geodyn");
-  cout << earth->totalNeut << endl;
+  cout << earth->totalFlux << endl;
   ofstream outfile;
   outfile.open("earth_simul_plots.csv");
   for(int k=0;k<N;k++){
@@ -937,8 +931,8 @@ int main(int argc, char const *argv[]) {
   outfile.close();
 
 int xtest, ytest;
-xtest=100;
-ytest=200;
+xtest=400;
+ytest=800;
   ofstream test_path_file;
   test_path_file.open("test_path.csv");
   int test_N = int(earth->asArray[xtest][ytest].pathLen);
@@ -946,9 +940,9 @@ ytest=200;
     test_path_file << earth->asArray[xtest][ytest].path[step] << endl;
   }
   test_path_file.close();
-  cout << (earth->asArray[xtest][ytest].allowedEnergiesU[0]) << endl;
-  cout << calculateProbability(test_N, earth->asArray[xtest][ytest].path, (earth->asArray[xtest][ytest].allowedEnergiesU[0])) << endl;
-  calculateProbabilitiesFunctionEnergy(test_N, earth->asArray[xtest][ytest].path);
+  cout << (earth->asArray[xtest][ytest].allowedEnergiesU[30]) << endl;
+  cout << calculateProbability(test_N, earth->asArray[xtest][ytest].path, (earth->asArray[xtest][ytest].allowedEnergiesU[30])) << endl;
+  //calculateProbabilitiesFunctionEnergy(test_N, earth->asArray[xtest][ytest].path);
   delete earth;
   return 0;
 }

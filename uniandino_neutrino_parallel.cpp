@@ -26,6 +26,15 @@ double Ue1, Ue2, Ue3, Umu1, Umu2, Umu3, Ut1, Ut2, Ut3;
 gsl_matrix *CKM;
 
 //Functions
+float density_to_potential(float dty, bool antineutrino){
+  float to_return = (1./sqrt(2))*dty*1e-3*8.96189e-47*1e9   /1.672e-27;
+  if(antineutrino){
+    return -1*to_return;
+  }
+  else{
+    return to_return;
+  }
+}
 double longitude_units_conversion(double lon_in_km){
 	return lon_in_km*1e3/(1.972e-7);
 }
@@ -48,6 +57,7 @@ void densityStep ( double *fill , double *dist, int arraysize){
 	}
 
 }
+
 vector<double> density_array_from_key (string key, int steps){
 	vector<double> potential;
 	potential.reserve(steps);
@@ -72,9 +82,9 @@ vector<double> density_array_from_key (string key, int steps){
 		}
 	}
 	else if(key=="sun"){
-		linspace(path, 6.96e5, 0., steps);
+		linspace(path, 6.96e5, 1000., steps);
 		for(int i =0;i<steps;i++){
-			potential[i]=(1./sqrt(2))*(8.96189e-47*1e9/931.494)*200*5.61e26*exp(-path[i]/66000);
+			potential[i]=density_to_potential((200*exp(-path[i]/66000)), 0);
 		}
 	}
 	return potential;
@@ -335,15 +345,15 @@ void calculateProbabilities(){
   gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
   generate_real_identity(Id);
   copy_to_complex_from_real(Id, operator_product);
-  int N=10000;
-	int Steps=1000;
+  int N=1000;
+	int Steps=10000;
 	double EnergyLins[N];
 	double exps[N];
-	linspace(exps, 11, 5, N);
+	linspace(exps, 5, 12, N);
 	for(int i=0;i<N;i++){
 		EnergyLins[i]=pow(10, exps[i]);
 	}
-	vector<double> DensityStep = density_array_from_key("sun", Steps);
+	vector<double> DensityStep = density_array_from_key("fig_4", Steps);
 	omp_set_num_threads(threads);
 	int i,k;
 	double Probabilities[N][3];
@@ -360,8 +370,8 @@ void calculateProbabilities(){
 	  for(k=0;k<Steps;k++){
 	    double density=DensityStep[k];
 			//double len = (2885.+6972.)/Steps; //When figure 1 is plotted
-			//double len = 12742./Steps; //When figure 4 or 6 are plotted
-			double len = 6.96e5/Steps; //When sun thing is plotted
+			double len = 12742./Steps; //When figure 4 or 6 are plotted
+			//double len = 6.96e5/Steps; //When sun thing is plotted
 	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
 	    *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
 	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
