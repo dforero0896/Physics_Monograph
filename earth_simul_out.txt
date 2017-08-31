@@ -1,0 +1,19 @@
+/var/spool/torque/mom_priv/jobs/142815.clustermaster.uniandes.edu.co.SC: line 34: gsl-config: command not found
+g++: spectra_sampling_MCMC.cpp: No such file or directory
+--------------------------------------------------------------------------
+mpirun was unable to launch the specified application as it could not access
+or execute an executable:
+
+Executable: ./spectra_sampling_MCMC.o
+Node: node-9.local
+
+while attempting to start process rank 0.
+--------------------------------------------------------------------------
+2 total processes failed to start
+/var/spool/torque/mom_priv/jobs/142815.clustermaster.uniandes.edu.co.SC: line 38: gsl-config: command not found
+g++: earth_simul.cpp: No such file or directory
+g++: no input files
+/var/spool/torque/mom_priv/jobs/142815.clustermaster.uniandes.edu.co.SC: line 40: ./earth_test.o: No such file or directory
+
+
+(hpcstats) Getting modules

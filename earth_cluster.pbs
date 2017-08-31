@@ -5,8 +5,9 @@
 # the options
 # First we need to stablish the name of the queue we will utilize.
 # For example if we need 8 intel processors and 64GB or RAM for one week in one node.
-#PBS -l nodes=1:intel:ppn=8, mem=32gb
-#PBS -l walltime=00:01:00:00
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=32gb
+#PBS -l walltime=00:00:60:00
 #PBS -M df.forero10@uniandes.edu.co
 #PBS -m abe
 #PBS -N test1_earth_simul
@@ -18,33 +19,6 @@ TEMP_DIR=/state/partition1/$USER/$PBS_JOBNAME.$PBS_JOBID
 # Create the directory to store the computation output. For example
 # results inside the working directory.
 OUT_DIR=$PBS_O_WORKDIR/results
-
-# Creates a script log with the following information:
-SCRIPT_LOG=script $PBS_O_WORKDIR/$PBS_JOBNAME.$PBS_JOBID.log
-touch $SCRIPT_LOG
-# Now store the information into the script log
-echo ”Job started on” ‘hostname‘ ‘date‘ >> $SCRIPT_LOG
-echo ”#####################################”  >> $SCRIPT_LOG
-echo ”PBS working directory: $PBS_O_WORKDIR” >> $SCRIPT_LOG
-echo ”Current directory:” ‘pwd‘ >> $SCRIPT_LOG
-echo ”Temporary directory: ”$TEMP_DIR >> $SCRIPT_LOG
-echo ”Output directory: ”$OUT_DIR >> $SCRIPT_LOG
-echo ”#####################################”  >> $SCRIPT_LOG
-echo ”User: $PBS_O_LOGNAME” >>$SCRIPT_LOG
-echo ”Batch job started on $PBS_O_HOST” >>$SCRIPT_LOG
-echo ”PBS job id: $PBS_JOBID” >>$SCRIPT_LOG
-echo ”PBS job name: $PBS_JOBNAME” >>$SCRIPT_LOG
-echo ”PBS environment: $PBS_ENVIRONMENT” >>$SCRIPT_LOG
-echo ”#####################################”  >> $SCRIPT_LOG
-echo >>$SCRIPT_LOG
-echo ”#####################################” >> $SCRIPT_LOG
-echo ”#####################################”  >> $SCRIPT_LOG
-echo ”Full Environment:” >>$SCRIPT_LOG
-printenv >>$SCRIPT_LOG
-echo ”#####################################”  >> $SCRIPT_LOG
-echo >>$SCRIPT_LOG
-echo ”The Job is being executed on the following node:” >>$SCRIPT_LOG
-cat $PBS_NODEFILE >>$SCRIPT_LOG
 
 
 mkdir -p $TEMP_DIR
@@ -69,6 +43,4 @@ g++ -fopenmp -o earth_simul.o earth_simul.cpp `gsl-config --cflags --libs`
 
 cd $OUT_DIR
 mv -f $TEMP_DIR ./
-# OPTIONAL (If you selected Body Part II): Output the finishing
-# date on the script log
-echo ”Job Finished: ” ‘date‘ >>$SCRIPT_LOG
+
