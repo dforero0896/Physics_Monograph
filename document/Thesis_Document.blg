@@ -1,51 +1,20 @@
-This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
-Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
-The top-level auxiliary file: Thesis_Document.aux
-The style file: unsrt.bst
-Database file #1: refs.bib
-Repeated entry---line 137 of file refs.bib
- : @book{Goldschmidt1958
- :                      ,
-I'm skipping whatever remains of this entry
-You've used 8 entries,
-            1791 wiz_defined-function locations,
-            501 strings with 4823 characters,
-and the built_in function-call counts, 1785 in all, are:
-= -- 164
-> -- 73
-< -- 1
-+ -- 28
-- -- 20
-* -- 116
-:= -- 291
-add.period$ -- 24
-call.type$ -- 8
-change.case$ -- 7
-chr.to.int$ -- 0
-cite$ -- 8
-duplicate$ -- 78
-empty$ -- 174
-format.name$ -- 20
-if$ -- 391
-int.to.chr$ -- 0
-int.to.str$ -- 8
-missing$ -- 10
-newline$ -- 43
-num.names$ -- 8
-pop$ -- 21
-preamble$ -- 1
-purify$ -- 0
-quote$ -- 0
-skip$ -- 32
-stack$ -- 0
-substring$ -- 128
-swap$ -- 13
-text.length$ -- 1
-text.prefix$ -- 0
-top$ -- 0
-type$ -- 0
-warning$ -- 0
-while$ -- 19
-width$ -- 9
-write$ -- 89
-(There was 1 error message)
+[0] Config.pm:340> INFO - This is Biber 2.4
+[1] Config.pm:343> INFO - Logfile is 'Thesis_Document.blg'
+[67] biber:287> INFO - === vie sep 29, 2017, 22:13:29
+[220] Biber.pm:348> INFO - Reading 'Thesis_Document.bcf'
+[472] Biber.pm:742> INFO - Found 13 citekeys in bib section 0
+[486] Biber.pm:3151> INFO - Processing section 0
+[541] Biber.pm:3308> INFO - Looking for bibtex format file 'refs.bib' for section 0
+[733] bibtex.pm:1113> INFO - Decoding LaTeX character macros into UTF-8
+[895] bibtex.pm:974> INFO - Found BibTeX data source 'refs.bib'
+[898] Utils.pm:147> WARN - Duplicate entry key: 'Goldschmidt1958' in file 'refs.bib', skipping ...
+[982] Utils.pm:147> WARN - ISBN '0012-821X' in entry 'Sramek2013' is invalid - run biber with '--validate_datamodel' for details.
+[1066] Utils.pm:147> WARN - ISBN '1525-2027' in entry 'Huang2013' is invalid - run biber with '--validate_datamodel' for details.
+[1084] Utils.pm:147> WARN - ISBN '0031-9201' in entry 'Dziewonski1981' is invalid - run biber with '--validate_datamodel' for details.
+[1324] UCollate.pm:65> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1324] UCollate.pm:65> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1324] Biber.pm:3028> INFO - Sorting list 'nty/global' of type 'entry' with scheme 'nty' and locale 'en-US'
+[1324] Biber.pm:3032> INFO - No sort tailoring available for locale 'en-US'
+[1360] bbl.pm:519> INFO - Writing 'Thesis_Document.bbl' with encoding 'UTF-8'
+[1503] bbl.pm:615> INFO - Output to Thesis_Document.bbl
+[1503] Biber.pm:109> INFO - WARNINGS: 4

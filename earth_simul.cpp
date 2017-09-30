@@ -1,7 +1,9 @@
-/*
+  /*
 g++ -fopenmp -o earth_simul.o earth_simul.cpp `gsl-config --cflags --libs`
-*/
 
+ */
+#include "earth_simul.h"
+/*
 #include<iostream>
 #include <fstream>
 #include <sstream>
@@ -16,7 +18,10 @@ using namespace std;
 #include <gsl/gsl_randist.h>
 #include <sys/time.h>
 #include "omp.h"
+*/
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+/*
 #include<iostream>
 #include <vector>
 using namespace std;
@@ -28,9 +33,12 @@ using namespace std;
 #include<string>
 #include<sstream>
 #include <omp.h>
+*/
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 const int N = 1000;
+const int N_x=500;
+const int N_z=1000;
 const int PREM_len = 187;
 const int totalNeutrinos=10000000;
 const int path_resolution = 50; //km
@@ -47,6 +55,7 @@ gsl_rng *Gen; //The actual generator object.
 gsl_spline *spectrum_spline;
 gsl_interp_accel *acc;
 
+//RingNode asArray[N_x][N_z];
 
 void read_file_into_2D_array(string filename, double to_fill[4500][2]){
   //Fills the array to_fill with 4500 elements for energy and neutrino/energy.
@@ -179,7 +188,7 @@ float density_to_potential(float dty, bool antineutrino){
   }
 }
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
+/*
 
 //Constants
 //Mass differences
@@ -475,7 +484,7 @@ void calculateProbabilitiesFunctionEnergy(int steps, vector<float> path){
 
 
 }
-
+*/
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
@@ -528,6 +537,7 @@ void split_array(vector< vector<float> > to_split, float container[PREM_len], in
     }  }
 }
 */
+/*
 float calculateProbability(int steps, vector<float> path, float energy_param){
   int threads =4;
   //CKM matrix elements calculated just once.
@@ -579,66 +589,21 @@ i=0;
 
   return float(Probabilities[0][0]);
 }
-
-class RingNode{
-  public:
-    float x;
-    float z;
-    float r;
-    float getRadius(){
+*/
+    float RingNode::getRadius(){
       r = sqrt(x*x + z*z);
       return r;
     }
-    bool isEarth;
-    bool isSE;
-    bool isCrust;
-    bool isMantle;
-    float mass;
-    float massDensity;
-    float solidAngle;
-    float getSolidAngle(){
-      solidAngle = 2*PI*(x*dx/((R_earth-z)*(R_earth-z) + x*x));
+    float RingNode::getSolidAngle(){
+      solidAngle = (1./((R_earth-z)*(R_earth-z) + x*x));
       return solidAngle;
     }
     float volume;
-    float getVolume(){
+    float RingNode::getVolume(){
       volume = 2*PI*x*dx*dz;
       return volume;
     }
-    float abundanceU;
-    float abundanceTh;
-    float neutrinoFlux;
-    float neutrinoThFlux;
-    float neutrinoUFlux;
-    float neutrinoFluxMeasure;
-    float neutrinoThFluxMeasure;
-    float neutrinoUFluxMeasure;
-    float relativeNeutrinoTh;
-    float relativeNeutrinoU;
-    float relativeNeutrino;
-    float neutrinosProduced;
-    float neutrinosProducedU;
-    float neutrinosProducedTh;
-    vector<float> path;
-    float pathLen;
-    float distanceToDetector;
-    vector <float> allowedEnergiesTh;
-    vector <float> allowedEnergiesU;
-    vector <float> probabilitiesTh;
-    vector <float> probabilitiesU;
-
-
-};
-
-class Planet{
-  public:
-    RingNode asArray[N/2][N];
-    float totalMass;
-    float crustMass;
-    float mantleMass;
-    float totalFlux;
-    int totalNeut;
-    void initializeCoords(){
+    void Planet::Planet::Planet::initializeCoords(){
       cout << "Initializing Coordinates" << endl;
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
@@ -670,7 +635,7 @@ class Planet{
         }
       }
     }
-    void initializeDensity(){
+    void Planet::initializeDensity(){
       cout << "Initializing Density" << endl;
       /*
       vector< vector<float> > PREM_complete;
@@ -703,7 +668,7 @@ class Planet{
       //gsl_spline_free(spline);
       //gsl_interp_accel_free(acc);
     }
-    void initializeAbundanceCrust(){
+    void Planet::initializeAbundanceCrust(){
       cout << "Initializing Abundances in the Crust" << endl;
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
@@ -718,7 +683,7 @@ class Planet{
         }
       }
     }
-    void initializeAbundanceMantle(string key, string bse_model){
+    void Planet::initializeAbundanceMantle(string key, string bse_model){
       cout << "Initializing Abundances in the Mantle" << endl;
       int model;
       if(bse_model=="cosmo"){model=0;}
@@ -761,13 +726,13 @@ class Planet{
 
       }
     }
-    void initializeFluxes(){
+    void Planet::initializeFluxes(){
       cout << "Initializing Fluxes" << endl;
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){
           if(asArray[i][k].isSE){
-            asArray[i][k].neutrinoUFlux=(asArray[i][k].abundanceU*1e-6)*(asArray[i][k].massDensity*1e3)*(6)*((4.916*1e-18*1e-6)*(0.9927)/(238.051*1.661e-27))*(asArray[i][k].volume*1e15)*asArray[i][k].solidAngle;
-            asArray[i][k].neutrinoThFlux=(asArray[i][k].abundanceTh*1e-6)*(asArray[i][k].massDensity*1e3)*(4)*((1.563*1e-18*1e-6)*(1)/(232.038*1.661e-27))*(asArray[i][k].volume*1e15)*asArray[i][k].solidAngle;
+            asArray[i][k].neutrinoUFlux=(6.)*(asArray[i][k].abundanceU*1e-9)*(0.9927)*(4.916*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(238.051*1.661e-27);
+            asArray[i][k].neutrinoThFlux=(4.)*(asArray[i][k].abundanceTh*1e-9)*(1.)*(1.563*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(235.044*1.661e-27);
             asArray[i][k].neutrinoFlux=  asArray[i][k].neutrinoUFlux+asArray[i][k].neutrinoThFlux;
             asArray[i][k].relativeNeutrinoU=asArray[i][k].neutrinoUFlux/asArray[i][k].neutrinoFlux;
             asArray[i][k].relativeNeutrinoTh=asArray[i][k].neutrinoThFlux/asArray[i][k].neutrinoFlux;
@@ -792,7 +757,7 @@ class Planet{
         }
       }
     }
-    void initializePaths(){
+    void Planet::initializePaths(){
       cout << "Initializing Potential (density) paths" << endl;
       omp_set_num_threads(4);
       int i, k;
@@ -820,7 +785,7 @@ class Planet{
         }
       }
     }
-    void initializeEnergySamples(){
+    void Planet::initializeEnergySamples(){
       cout << "Initializing Energies for Neutrinos" << endl;
       float *uran_energy_repo;
       float *thor_energy_repo;
@@ -841,7 +806,7 @@ class Planet{
               path_U.reserve(U_len);
               asArray[i][k].allowedEnergiesU.reserve(U_len);
               for(n=0;n<U_len;n++){
-                asArray[i][k].allowedEnergiesU.push_back(1e6*uran_energy_repo[uran_i]);
+                path_U.push_back(1e6*uran_energy_repo[uran_i]);
                 uran_i++;
               }
             }
@@ -850,7 +815,7 @@ class Planet{
               asArray[i][k].allowedEnergiesTh.reserve(Th_len);
               path_Th.reserve(Th_len);
               for(m=0;m<Th_len;m++){
-                asArray[i][k].allowedEnergiesTh.push_back(1e6*thor_energy_repo[thor_i]);
+                path_Th.push_back(1e6*thor_energy_repo[thor_i]);
                 thor_i++;
               }
             }
@@ -860,6 +825,7 @@ class Planet{
         }
       }
     }
+    /*
     void simulateProbabilities(){
       cout << "Simulating Oscillations" << endl;
       for(int i=0;i<N/2;i++){
@@ -888,38 +854,30 @@ class Planet{
         }
       }
     }
+*/
 
-    void simulateSignal(){
-      float eff_U = 0.692;
-      float eff_Th = 0.68;
-      for(int i=0;i<N/2;i++){
-        for(int k=0;k<N;k++){
-
-        }
-      }
-    }
-    void initialize(string key, string bse_model){
+    void Planet::initialize(string key, string bse_model){
       cout << "Building Planet" << endl;
-      initializeCoords();
-      initializeDensity();
-      initializeAbundanceCrust();
-      initializeAbundanceMantle(key, bse_model);
-      initializeFluxes();
-      initializePaths();
-      initializeEnergySamples();
-      simulateProbabilities();
+      Planet::initializeCoords();
+      Planet::initializeDensity();
+      Planet::initializeAbundanceCrust();
+      Planet::initializeAbundanceMantle(key, bse_model);
+      Planet::initializeFluxes();
+      Planet::initializePaths();
+      Planet::initializeEnergySamples();
+      //simulateProbabilities();
       cout << "Done" << endl;
     }
 
 
-};
 
+/*
 
 int main(int argc, char const *argv[]) {
   Planet *earth = new Planet();
 
   earth->initialize("two_layer", "geodyn");
-  cout << earth->totalFlux << endl;
+  cout << "total flux " << earth->totalFlux << endl;
   ofstream outfile;
   outfile.open("earth_simul_plots.csv");
   for(int k=0;k<N;k++){
@@ -931,8 +889,8 @@ int main(int argc, char const *argv[]) {
   outfile.close();
 
 int xtest, ytest;
-xtest=400;
-ytest=800;
+xtest=3;
+ytest=998;
   ofstream test_path_file;
   test_path_file.open("test_path.csv");
   int test_N = int(earth->asArray[xtest][ytest].pathLen);
@@ -940,9 +898,11 @@ ytest=800;
     test_path_file << earth->asArray[xtest][ytest].path[step] << endl;
   }
   test_path_file.close();
-  cout << (earth->asArray[xtest][ytest].allowedEnergiesU[30]) << endl;
-  cout << calculateProbability(test_N, earth->asArray[xtest][ytest].path, (earth->asArray[xtest][ytest].allowedEnergiesU[30])) << endl;
+  cout << "an energy " << (earth->asArray[xtest][ytest].allowedEnergiesU[30]) << endl;
+  //cout << "the prob " << calculateProbability(test_N, earth->asArray[xtest][ytest].path, (earth->asArray[xtest][ytest].allowedEnergiesU[30])) << endl;
   //calculateProbabilitiesFunctionEnergy(test_N, earth->asArray[xtest][ytest].path);
+  cout << "total mass " << earth->totalMass << endl;
   delete earth;
   return 0;
 }
+*/
