@@ -42,7 +42,7 @@ plt.tight_layout()
 plt.gcf()
 plt.savefig('probPlot.png', dpi=500)
 
-'''
+
 comparison, ax = plt.subplots(1, 1)
 ax.plot(probData[:,0], probData[:,2])
 ax.set_ylabel('$P_{\mu e}$', fontsize=15)
@@ -52,7 +52,7 @@ ax.set_ylim(0, 0.6)
 ax.set_xlim(1e9, 1e10+3e9)
 plt.gcf()
 plt.savefig('document/probComp.png', dpi=500)
-'''
+
 '''
 energyData=np.loadtxt('energy_repo_238U.knt', dtype=float)
 energyData2=np.loadtxt('energy_repo_232Th.knt', dtype=float)
