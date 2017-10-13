@@ -8,7 +8,7 @@ int N =1000;
 int main(int argc, char const *argv[]) {
   Planet *earth = new Planet();
   earth -> initializeCoords();
-  for(int i =0 ; i<N/2;i++){
+  for(int i =0 ; i<500;i++){
     for(int k = 0;k<N;k++){
       if(earth->asArray[i][k].isSE){
         earth->asArray[i][k].meanSurvProb = 0.55;}
@@ -18,9 +18,8 @@ int main(int argc, char const *argv[]) {
   outfile.open("probability_planet.csv");
   for(int k=0;k<N;k++){
     for(int i =0 ; i<N/2;i++){
-      outfile << earth->asArray[i][k].meanSurvProb << ',' ;
+      outfile << i<< ' ' << k <<' ' << earth->asArray[i][k].meanSurvProb << endl;
       }
-      outfile << 0 << endl;
     }
   outfile.close();
   return 0;

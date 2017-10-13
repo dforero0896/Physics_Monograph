@@ -346,7 +346,7 @@ void calculateProbabilities(){
   generate_real_identity(Id);
   copy_to_complex_from_real(Id, operator_product);
   int N=1000;
-	int Steps=10000;
+	int Steps=1000;
 	double EnergyLins[N];
 	double exps[N];
 	linspace(exps, 5, 12, N);

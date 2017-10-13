@@ -40,6 +40,7 @@ void spectrum_array2D(string filename, float to_fill[4500][2]){
 }
 
 
+
 void import_model(string filename, double model_matrix[199][10]){
   float rad, depth, density, Vpv, Vph, Vsv, Vsh, eta, Q_mu, Q_kappa;
   string line;
@@ -76,11 +77,37 @@ void import_model(string filename, double model_matrix[199][10]){
     splittable_line.clear();
   }
 }
-
+vector < vector <float> > import_probability(string filename){
+  string line;
+  ifstream infile(filename.c_str());
+  int i = 0; //iteration/line
+  vector < vector <float> > prob_matrix;
+  prob_matrix.reserve(1000);
+  while(getline(infile, line) && i<1000){
+    istringstream splittable_line(line);
+    string field;
+    vector<float> row;
+    row.reserve(500);
+    while(getline(splittable_line, field, ',')){
+      istringstream field_ss(field);
+      float field_num;
+      field_ss >> field_num;
+      row.push_back(field_num);
+    }
+    prob_matrix.push_back(row);
+    splittable_line.clear();
+    i++;
+  }
+  return prob_matrix;
+}
 int main(int argc, char const *argv[]) {
-float arr[4500][2];
-spectrum_array2D("../../AntineutrinoSpectrum_all/AntineutrinoSpectrum_238U.knt", arr);
-cout << arr[30][0]<< endl;
+  vector< vector<float> > prob_matrix = import_probability("../probability_planet.csv");
+  for(int i = 0;i<1000;i++){
+    for(int k = 0;k<500;k++){
+      cout << prob_matrix[i][k] << ',';
+    }
+    cout << '0' << endl;
+  }
 
   return 0;
 }

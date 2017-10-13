@@ -114,8 +114,17 @@ int main(int argc, char const *argv[]) {
   double x_arr[4500], y_arr[4500];
   split_array(spectrum, x_arr, 0);
   split_array(spectrum, y_arr, 1);
-  gsl_spline_init(spectrum_spline, x_arr, y_arr, 4500); //Initialize spline object.
-  double *rand_sampl = mh_sampling(spectrum);
+  double real_y_arr[4500];
+  for(int n=0;n<4500;n++){
+    real_y_arr[n]=x_arr[n]*y_arr[n];
+  }
+  gsl_spline_init(spectrum_spline, x_arr, real_y_arr, 4500); //Initialize spline object.
+  double  real_spectrum[4500][2];
+  for(int n = 0;n<4500;n++){
+    real_spectrum[n][0]=x_arr[n];
+    real_spectrum[n][1]=real_y_arr[n];
+  }
+  double *rand_sampl = mh_sampling(real_spectrum);
   gsl_rng_free(Gen);
   string savename = "energy_repo_";
   savename+=isotname;

@@ -3,38 +3,6 @@ g++ -fopenmp -o earth_simul.o earth_simul.cpp `gsl-config --cflags --libs`
 
  */
 #include "earth_simul.h"
-/*
-#include<iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <stdlib.h>
-#include <string>
-using namespace std;
-#include <cmath>
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
-#include <sys/time.h>
-#include "omp.h"
-*/
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-/*
-#include<iostream>
-#include <vector>
-using namespace std;
-#include<gsl/gsl_sf_trig.h>
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_complex_math.h>
-#include <gsl/gsl_math.h>
-#include<gsl/gsl_blas.h>
-#include<string>
-#include<sstream>
-#include <omp.h>
-*/
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 const int N = 1000;
 const int N_x=500;
@@ -56,7 +24,28 @@ gsl_spline *spectrum_spline;
 gsl_interp_accel *acc;
 
 //RingNode asArray[N_x][N_z];
-
+void import_probability(string filename, float prob_matrix[500][1000]){
+  string line;
+  ifstream infile(filename.c_str());
+  int i = 0; //iteration/line
+  string i_str;
+  string k_str;
+  string prob_str;
+  while(infile >> i_str >> k_str >> prob_str){
+    istringstream i_ss(i_str);
+    istringstream k_ss(k_str);
+    istringstream prob_ss(prob_str);
+    int i_int, k_int;
+    float prob_num;
+    i_ss >> i_int;
+    k_ss >> k_int;
+    prob_ss >> prob_num;
+    prob_matrix[i_int][k_int]=prob_num;
+    i_ss.clear();
+    k_ss.clear();
+    prob_ss.clear();
+  }
+}
 void read_file_into_2D_array(string filename, double to_fill[4500][2]){
   //Fills the array to_fill with 4500 elements for energy and neutrino/energy.
 
@@ -187,409 +176,6 @@ float density_to_potential(float dty, bool antineutrino){
     return to_return;
   }
 }
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-/*
-
-//Constants
-//Mass differences
-double dM32 = 3.2E-3; //eV^2
-double dm21 = 0.0; //eV^2
-//Vacuum mixing angles
-double thetaA = 45.; //Degrees
-double thetaB = 5.; //Degrees
-double thetaC = 45.; //Degrees
-//CKM Elements
-double Ue1, Ue2, Ue3, Umu1, Umu2, Umu3, Ut1, Ut2, Ut3;
-gsl_matrix *CKM;
-
-//Functions
-double longitude_units_conversion(double lon_in_km){
-	return lon_in_km*1e3/(1.972e-7);
-}
-double deg2rad(double deg){
-	return deg*PI/180.;
-}
-void fill_real_matrix(gsl_matrix *empty, double elem_11, double elem_12, double elem_13, double elem_21, double elem_22, double elem_23, double elem_31, double elem_32, double elem_33){
-  gsl_matrix_set(empty, 0, 0, elem_11);
-  gsl_matrix_set(empty, 0, 1, elem_12);
-  gsl_matrix_set(empty, 0, 2, elem_13);
-  gsl_matrix_set(empty, 1, 0, elem_21);
-  gsl_matrix_set(empty, 1, 1, elem_22);
-  gsl_matrix_set(empty, 1, 2, elem_23);
-  gsl_matrix_set(empty, 2, 0, elem_31);
-  gsl_matrix_set(empty, 2, 1, elem_32);
-  gsl_matrix_set(empty, 2, 2, elem_33);
-}
-
-void toFlavor (const gsl_matrix *toTransform, gsl_matrix *destiny, const gsl_matrix *CKM){
-	int alpha, beta, a, b;
-	long double sum;
-	for (alpha=0;alpha<3;alpha++){
-		for (beta=0;beta<3; beta++){
-			sum=0.;
-			for (a=0;a<3;a++){
-				for (b=0;b<3;b++){
-					sum += gsl_matrix_get(CKM, alpha, a)*gsl_matrix_get(CKM, beta, b)*gsl_matrix_get(toTransform, a, b);
-
-				}
-			}
-			gsl_matrix_set(destiny, alpha, beta, sum);
-		}
-	}
-}
-gsl_matrix generate_real_identity(gsl_matrix *matrix){
-	int i, k;
-	for(i=0;i<3;i++){
-		for(k=0;k<3;k++){
-			if(i==k){
-				gsl_matrix_set(matrix, i, k, 1);
-			}
-			else{
-				gsl_matrix_set(matrix, i, k,0);
-			}
-		}
-	}
-	return *matrix;
-}
-gsl_matrix scale_real_matrix(gsl_matrix *to_scale, double factor){
-  gsl_matrix *result =gsl_matrix_alloc(3,3);
-  for(int i=0;i<3;i++){
-    for(int k=0; k<3; k++){
-      double element=gsl_matrix_get(to_scale, i, k);
-      element*=factor;
-      gsl_matrix_set(result, i,k,element);
-    }
-  }
-  return *result;
-}
-gsl_matrix add_real_matrices(gsl_matrix *term_1, gsl_matrix *term_2){
-  for(int i=0;i<3;i++){
-    for(int k=0; k<3; k++){
-      double element_1=gsl_matrix_get(term_1, i, k);
-      double element_2=gsl_matrix_get(term_2, i, k);
-      element_1+=element_2;
-      gsl_matrix_set(term_1, i,k,element_1);
-    }
-  }
-  return *term_1;
-}
-gsl_matrix_complex copy_to_complex_from_real(gsl_matrix *real, gsl_matrix_complex *container){
-  for(int i=0;i<3;i++){
-    for(int k=0; k<3; k++){
-      gsl_matrix_complex_set(container, i,k, gsl_complex_rect(gsl_matrix_get(real, i, k), 0));
-    }
-  }
-}
-gsl_matrix_complex scale_complex_matrix(gsl_matrix_complex *to_scale, gsl_complex complex_factor, double real_factor){
-  for(int i=0;i<3;i++){
-    for(int k=0; k<3; k++){
-      gsl_complex element=gsl_matrix_complex_get(to_scale, i, k);
-      element = gsl_complex_mul(element, complex_factor);
-      element = gsl_complex_mul_real(element, real_factor);
-      gsl_matrix_complex_set(to_scale, i,k,element);
-    }
-  }
-  return *to_scale;}
-
-void fill_complex_matrix(gsl_matrix_complex *empty, gsl_complex elem_11, gsl_complex elem_12, gsl_complex elem_13, gsl_complex elem_21, gsl_complex elem_22, gsl_complex elem_23, gsl_complex elem_31, gsl_complex elem_32, gsl_complex elem_33){
-  gsl_matrix_complex_set(empty, 0, 0, elem_11);
-  gsl_matrix_complex_set(empty, 0, 1, elem_12);
-  gsl_matrix_complex_set(empty, 0, 2, elem_13);
-  gsl_matrix_complex_set(empty, 1, 0, elem_21);
-  gsl_matrix_complex_set(empty, 1, 1, elem_22);
-  gsl_matrix_complex_set(empty, 1, 2, elem_23);
-  gsl_matrix_complex_set(empty, 2, 0, elem_31);
-  gsl_matrix_complex_set(empty, 2, 1, elem_32);
-  gsl_matrix_complex_set(empty, 2, 2, elem_33);
-}
-gsl_matrix_complex copy_to_complex_from_complex(gsl_matrix_complex *complex, gsl_matrix_complex *container){
-  for(int i=0;i<3;i++){
-    for(int k=0; k<3; k++){
-      gsl_matrix_complex_set(container, i,k, gsl_matrix_complex_get(complex, i, k));
-    }
-  }
-}
-gsl_matrix_complex calculateOperator(double neutrinoEnergy, double A, double L){
-  double E21=dm21/(2*neutrinoEnergy);
-  double E32=dM32/(2*neutrinoEnergy);
-  double E12=-E21;
-  double E23=-E32;
-  double E31=E12-E23;
-  double E13=-E31;
-  //Elements of the Tmatrix in mass basis
-  double T_11=A*Ue1*Ue1-(1./3)*A+(1./3)*(E12+E13);
-  double T_12=A*Ue1*Ue2;
-  double T_13=A*Ue1*Ue3;
-  double T_21=T_12;
-  double T_22=A*Ue2*Ue2-(1./3)*A+(1./3)*(E21+E23);
-  double T_23=A*Ue2*Ue3;
-  double T_31=T_13;
-  double T_32=T_23;
-  double T_33=A*Ue3*Ue3-(1./3)*A+(1./3)*(E31+E32);
-  gsl_matrix *T_mass_mat = gsl_matrix_alloc(3,3);
-  fill_real_matrix(T_mass_mat, T_11, T_12, T_13, T_21, T_22, T_23, T_31, T_32, T_33);
-  //cout << "T matrix is:"<< endl;
-  //print_real_matrix(T_mass_mat);
-  //Elements of the T**2 matrix in mass basis
-  double T_sq_11=(1./3)*(A*A*(Ue1*Ue1+(1./3))+2*A*(Ue1*Ue1-(1./3))*(E21+E13)+(1./3)*(E12+E13)*(E12+E13));
-  double T_sq_12=(1./3)*Ue1*Ue2*A*(A+E13+E23);
-  double T_sq_13=(1./3)*Ue1*Ue3*A*(A+E21+E31);
-  double T_sq_21=T_sq_12;
-  double T_sq_22=(1./3)*(A*A*(Ue2*Ue2+(1./3))+2*A*(Ue2*Ue2-(1./3))*(E21+E23)+(1./3)*(E21+E23)*(E21+E23));
-  double T_sq_23=(1./3)*Ue2*Ue3*A*(A+E21+E31);
-  double T_sq_31=T_sq_13;
-  double T_sq_32=T_sq_23;
-  double T_sq_33=(1./3)*(A*A*(Ue3*Ue3+(1./3))+2*A*(Ue3*Ue3-(1./3))*(E31+E32)+(1./3)*(E31+E32)*(E31+E32));
-  gsl_matrix *T_sq_mass_mat = gsl_matrix_alloc(3, 3);
-  fill_real_matrix(T_sq_mass_mat, T_sq_11, T_sq_12, T_sq_13, T_sq_21, T_sq_22, T_sq_23, T_sq_31, T_sq_32, T_sq_33);
-  //cout << "T**2 matrix is:"<< endl;
-  //print_real_matrix(T_sq_mass_mat);
-  //T matrix in flavor basis
-  gsl_matrix *T_flav_mat = gsl_matrix_alloc(3, 3);
-  toFlavor(T_mass_mat, T_flav_mat, CKM);
-  //cout << "T matrix in flavor basis is:"<< endl;
-  //print_real_matrix(T_flav_mat);
-  //T**2 matrix in flavor basis
-  gsl_matrix *T_sq_flav_mat = gsl_matrix_alloc(3, 3);
-  toFlavor(T_sq_mass_mat, T_sq_flav_mat, CKM);
-  //cout << "T**2 matrix in flavor basis is:"<< endl;
-  //print_real_matrix(T_sq_flav_mat);
-  //Get rid of T and T**2 in mass basis as they are no longer useful
-  gsl_matrix_free(T_mass_mat);
-  gsl_matrix_free(T_sq_mass_mat);
-  //Calculate c's
-  double c1=T_11*T_22-T_12*T_21+T_11*T_33-T_13*T_31+T_22*T_33-T_23*T_32;
-  double c0=-(T_11*T_22*T_33-T_11*T_23*T_32-T_12*T_21*T_33+T_12*T_31*T_23+T_13*T_21*T_32-T_13*T_31*T_22);
-  //Calculate eigenvalues
-  long double q=c1/3;
-  long double r=-0.5*c0;
-  //Calculate eigenvalues.
-  gsl_complex atanArg = gsl_complex_rect((1./c0)*sqrt(-c0*c0-(4./27.)*c1*c1*c1), 0);
-  gsl_complex atanVal=gsl_complex_mul_real(gsl_complex_arctan(atanArg), 1./3.);
-  gsl_complex half = gsl_complex_rect(2*sqrt((-1./3.)*c1), 0);
-  gsl_complex s1Ps2 = gsl_complex_mul(half, gsl_complex_cos(atanVal));
-  gsl_complex dummy_s1Ms2 = gsl_complex_mul(half, gsl_complex_sin(atanVal));
-  gsl_complex s1Ms2 = gsl_complex_mul(dummy_s1Ms2, gsl_complex_rect(0., 1.));
-
-  gsl_complex lam1 = gsl_complex_add(gsl_complex_mul_real(s1Ps2, -1./2.), gsl_complex_mul_real(gsl_complex_mul(gsl_complex_rect(0., 1.), s1Ms2), sqrt(3.)/2.));
-
-  gsl_complex lam2 = gsl_complex_sub(gsl_complex_mul_real(s1Ps2, -1./2.), gsl_complex_mul_real(gsl_complex_mul(gsl_complex_rect(0., 1.), s1Ms2), sqrt(3.)/2.));
-
-  gsl_complex lam3 = s1Ps2;
-
-  //cout << "Eigenvals" << endl;
-  //print_complex_number(lam1);
-  //print_complex_number(lam2);
-  //print_complex_number(lam3);
-  //print_complex_number(gsl_complex_mul_real(gsl_complex_sub(lam3,lam2), 2*neutrinoEnergy));
-  //Calculate Operator
-  double trace_hamiltonian=0.5*E21+E32+3*neutrinoEnergy+A;
-  gsl_complex phi_phase = gsl_complex_polar(1., -L*trace_hamiltonian/3);
-  //print_complex_number(phi_phase);
-
-
-  gsl_complex eigenvalues[3]={lam1, lam2, lam3};
-  gsl_matrix_complex *evol_operator = gsl_matrix_complex_alloc(3, 3);
-  gsl_complex complex_zero=gsl_complex_rect(0,0);
-  fill_complex_matrix(evol_operator, complex_zero, complex_zero, complex_zero, complex_zero, complex_zero, complex_zero, complex_zero, complex_zero, complex_zero);
-  for(int n=0;n<3;n++){
-    gsl_matrix *I_term = gsl_matrix_alloc(3, 3);
-    generate_real_identity(I_term);
-    //cout << "Created Identity"<< endl;
-    //print_real_matrix(I_term);
-    gsl_matrix_scale(I_term, GSL_REAL(eigenvalues[n])*GSL_REAL(eigenvalues[n])+c1);
-    //cout << "Scaled Identity"<< endl;
-    //print_real_matrix(I_term);
-    gsl_matrix *T_term = gsl_matrix_alloc(3, 3);
-    *T_term = scale_real_matrix(T_flav_mat, GSL_REAL(eigenvalues[n]));
-    gsl_matrix_add(I_term, T_term);
-    gsl_matrix_add(I_term, T_sq_flav_mat);
-    //cout <<"The three terms"<<endl;
-    gsl_matrix_scale(I_term, 1./(3*GSL_REAL(eigenvalues[n])*GSL_REAL(eigenvalues[n])+c1));
-    //print_real_matrix(I_term);
-    gsl_matrix_complex *sum_term = gsl_matrix_complex_alloc(3, 3);
-    copy_to_complex_from_real(I_term, sum_term);
-    gsl_matrix_complex_scale(sum_term, gsl_complex_polar(1., -L*GSL_REAL(eigenvalues[n])));
-    gsl_matrix_complex_scale(sum_term, phi_phase);
-    //print_complex_matrix(sum_term);
-    gsl_matrix_complex_add(evol_operator, sum_term);
-    gsl_matrix_free(I_term);
-    gsl_matrix_free(T_term);
-    gsl_matrix_complex_free(sum_term);
-  }
-  //print_complex_matrix(evol_operator);
-  return *evol_operator;
-}
-void calculateProbabilitiesFunctionEnergy(int steps, vector<float> path){
-	int threads =4;
-  //CKM matrix elements calculated just once.
-	double theta1=deg2rad(thetaA);
-	double theta2=deg2rad(thetaB);
-	double theta3=deg2rad(thetaC);
-  Ue1 = gsl_sf_cos(theta2)*gsl_sf_cos(theta3);
-  Ue2 = gsl_sf_sin(theta3)*gsl_sf_cos(theta2);
-  Ue3 = gsl_sf_sin(theta2);
-  Umu1=-gsl_sf_sin(theta3)*gsl_sf_cos(theta1)-gsl_sf_sin(theta1)*gsl_sf_sin(theta2)*gsl_sf_cos(theta3);
-  Umu2=gsl_sf_cos(theta1)*gsl_sf_cos(theta3)-gsl_sf_sin(theta1)*gsl_sf_sin(theta2)*gsl_sf_sin(theta3);
-  Umu3=gsl_sf_sin(theta1)*gsl_sf_cos(theta2);
-  Ut1=gsl_sf_sin(theta1)*gsl_sf_sin(theta3)-gsl_sf_sin(theta2)*gsl_sf_cos(theta1)*gsl_sf_cos(theta3);
-  Ut2=-gsl_sf_sin(theta1)*gsl_sf_cos(theta3)-gsl_sf_sin(theta2)*gsl_sf_sin(theta3)*gsl_sf_cos(theta1);
-  Ut3=gsl_sf_cos(theta1)*gsl_sf_cos(theta2);
-  CKM=gsl_matrix_alloc(3, 3);
-  fill_real_matrix(CKM, Ue1, Ue2, Ue3, Umu1, Umu2, Umu3, Ut1, Ut2, Ut3);
-
-  int NN=10000;
-	//vector<float> EnergyLins=linspace(500, 5000000, NN);
-  vector<float> EnergyLins=linspace(2, 12, NN);
-  omp_set_num_threads(threads);
-	int i,k;
-	double Probabilities[NN][3];
-	#pragma omp parallel for private(i)
-	for(i=0;i<NN;i++){
-	  double energy=5*pow(10,EnergyLins[i]);
-    //double energy = EnergyLins[i];
-	  gsl_matrix *Id =gsl_matrix_alloc(3, 3);
-	  gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
-	  generate_real_identity(Id);
-	  copy_to_complex_from_real(Id, operator_product);
-		#pragma omp parallel for private(k)
-	  for(k=0;k<steps;k++){
-	    double density=double(path[k]);
-			double len = double(path_resolution);
-	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
-	    *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
-	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
-	    copy_to_complex_from_complex(operator_product, operator_product_copy);
-	    gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, gsl_complex_rect(1., 0), iter_operator, operator_product_copy, gsl_complex_rect(0., 0.),operator_product);
-	    gsl_matrix_complex_free(operator_product_copy);
-	    gsl_matrix_complex_free(iter_operator);
-	  }
-		//Probabilities[i] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
-		Probabilities[i][0] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0));
-		Probabilities[i][1] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
-		Probabilities[i][2] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,2));
-    gsl_matrix_complex_free(operator_product);
-		//cout << EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2] << endl;
-
-	}
-  ofstream prob_path_file;
-  prob_path_file.open("prob_path.csv");
-
-  for(i=0;i<NN;i++){
-		prob_path_file <<5*pow(10,EnergyLins[i]) << "," << Probabilities[i][0] <<  endl;
-		//cout << EnergyLins[i] << "," << Probabilities[i] << endl;
-	}
-  prob_path_file.close();
-
-
-
-}
-*/
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
-/*
-vector< vector<float> > import_model(string filename){
-  float rad, depth, density, Vpv, Vph, Vsv, Vsh, eta, Q_mu, Q_kappa;
-  string line;
-  ifstream infile(filename.c_str());
-  int i = 0;
-  vector< vector<float> > model_matrix;
-  model_matrix.reserve(199);
-  vector<float> last_row;
-  last_row.reserve(10);
-  while(getline(infile, line) && i<=199){
-    istringstream splittable_line(line);
-    string field;
-    vector<float> row;
-    row.reserve(10);
-    while(getline(splittable_line, field, ',')){
-      istringstream field_ss(field);
-      float field_num;
-      field_ss >> field_num;
-      row.push_back(field_num);
-    }
-    if(i==0){
-      model_matrix.push_back(row);
-      last_row = copy_vector(row);
-      counter++;
-    }
-    else if(row[0]<last_row[0]){
-      model_matrix.push_back(row);
-      last_row = copy_vector(row);
-      counter++;
-    }
-    splittable_line.clear();
-    i++;
-  }
-  return model_matrix;
-}
-
-void split_array(vector< vector<float> > to_split, float container[PREM_len], int comp, bool invert){
-  if(invert){
-    for(int i=0;i<PREM_len;i++){
-      container[PREM_len-1-i]=to_split[i][comp];
-    }
-  }
-  else{
-    for(int i=0;i<PREM_len;i++){
-      container[i]=to_split[i][comp];
-    }  }
-}
-*/
-/*
-float calculateProbability(int steps, vector<float> path, float energy_param){
-  int threads =4;
-  //CKM matrix elements calculated just once.
-  double theta1=deg2rad(thetaA);
-  double theta2=deg2rad(thetaB);
-  double theta3=deg2rad(thetaC);
-  Ue1 = gsl_sf_cos(theta2)*gsl_sf_cos(theta3);
-  Ue2 = gsl_sf_sin(theta3)*gsl_sf_cos(theta2);
-  Ue3 = gsl_sf_sin(theta2);
-  Umu1=-gsl_sf_sin(theta3)*gsl_sf_cos(theta1)-gsl_sf_sin(theta1)*gsl_sf_sin(theta2)*gsl_sf_cos(theta3);
-  Umu2=gsl_sf_cos(theta1)*gsl_sf_cos(theta3)-gsl_sf_sin(theta1)*gsl_sf_sin(theta2)*gsl_sf_sin(theta3);
-  Umu3=gsl_sf_sin(theta1)*gsl_sf_cos(theta2);
-  Ut1=gsl_sf_sin(theta1)*gsl_sf_sin(theta3)-gsl_sf_sin(theta2)*gsl_sf_cos(theta1)*gsl_sf_cos(theta3);
-  Ut2=-gsl_sf_sin(theta1)*gsl_sf_cos(theta3)-gsl_sf_sin(theta2)*gsl_sf_sin(theta3)*gsl_sf_cos(theta1);
-  Ut3=gsl_sf_cos(theta1)*gsl_sf_cos(theta2);
-  CKM=gsl_matrix_alloc(3, 3);
-  fill_real_matrix(CKM, Ue1, Ue2, Ue3, Umu1, Umu2, Umu3, Ut1, Ut2, Ut3);
-
-  int NN=10000;
-  //vector<float> EnergyLins=linspace(500, 5000000, NN);
-  vector<float> EnergyLins=linspace(2, 12, NN);
-  omp_set_num_threads(threads);
-  int i,k;
-  double Probabilities[NN][3];
-i=0;
-    double energy=double(energy_param);
-    //double energy = EnergyLins[i];
-    gsl_matrix *Id =gsl_matrix_alloc(3, 3);
-    gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
-    generate_real_identity(Id);
-    copy_to_complex_from_real(Id, operator_product);
-    for(k=0;k<steps;k++){
-      double density=double(path[k]);
-      double len = double(path_resolution);
-      gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
-      *iter_operator=calculateOperator(energy, density, longitude_units_conversion(len));
-      gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
-      copy_to_complex_from_complex(operator_product, operator_product_copy);
-      gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, gsl_complex_rect(1., 0), iter_operator, operator_product_copy, gsl_complex_rect(0., 0.),operator_product);
-      gsl_matrix_complex_free(operator_product_copy);
-      gsl_matrix_complex_free(iter_operator);
-    }
-    //Probabilities[i] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
-    Probabilities[i][0] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0));
-    Probabilities[i][1] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
-    Probabilities[i][2] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,2));
-    gsl_matrix_complex_free(operator_product);
-    //cout << EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2] << endl;
-
-  return float(Probabilities[0][0]);
-}
-*/
     float RingNode::getRadius(){
       r = sqrt(x*x + z*z);
       return r;
@@ -616,7 +202,7 @@ i=0;
             float di=-i;
             if(r>3480){
               asArray[i][k].isSE=1;
-              if(r>R_earth-32.5){
+              if(r>(R_earth-42.5)){
                 asArray[i][k].isCrust=1;
                 asArray[i][k].isMantle=0;
               }
@@ -673,12 +259,12 @@ i=0;
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
           if(asArray[i][k].isCrust){
-            asArray[i][k].abundanceU=1.31; //ppb
-            asArray[i][k].abundanceTh=5.61; //ppb
+            asArray[i][k].abundanceU=453.193965399; //ppb
+            asArray[i][k].abundanceTh=1940.64130183; //ppb
           }
           else{
-            asArray[i][k].abundanceU=0; //%
-            asArray[i][k].abundanceTh=0; //%
+            asArray[i][k].abundanceU=0.0001; //%
+            asArray[i][k].abundanceTh=0.0001; //%
           }
         }
       }
@@ -693,24 +279,29 @@ i=0;
         for(int i =0 ; i<N/2;i++){
           for(int k = 0;k<N;k++){
             if(asArray[i][k].isMantle){
-              asArray[i][k].abundanceU=calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceU_BSE, 1.31)[model]; //ppb
-              asArray[i][k].abundanceTh=calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceTh_BSE, 5.61)[model]; //ppb
+              asArray[i][k].abundanceU=calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceU_BSE,453.193965399 )[model]; //ppb
+              asArray[i][k].abundanceTh=calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceTh_BSE, 1940.64130183)[model]; //ppb
             }
           }
         }
       }
       else if(key=="two_layer"){
-        float bulk_mantle_U = calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceU_BSE, 1.31)[model];
-        float bulk_mantle_Th = calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceTh_BSE, 5.61)[model];
+        float bulk_mantle_U = calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceU_BSE, 453.193965399)[model];
+        float bulk_mantle_Th = calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceTh_BSE, 1940.64130183)[model];
+        cout << bulk_mantle_Th << endl;
         float mantleMass_fraction = 0.1*mantleMass;
         float mass_count=0;
         float limit_rad;
         int n=0;
+
         do {
-          mass_count+=4*PI*(asArray[n][500].r)*(asArray[n][500].r)*dx*1e3*1e9*asArray[n][500].massDensity;
-          limit_rad=asArray[n][500].r;
+          if(asArray[n][500].isMantle){
+            mass_count+=4*PI*(asArray[n][500].r)*(asArray[n][500].r)*dx*1e3*1e9*asArray[n][500].massDensity;
+            limit_rad=asArray[n][500].r;
+          }
           n++;
         } while(mass_count<=mantleMass_fraction);
+        cout << limit_rad << endl;
         for(int i =0 ; i<N/2;i++){
           for(int k = 0;k<N;k++){
             if(asArray[i][k].isMantle && asArray[i][k].r>limit_rad){
@@ -726,17 +317,26 @@ i=0;
 
       }
     }
-    void Planet::initializeFluxes(){
+
+    void Planet::initializeFluxes(bool oscillated){
+      totalFlux=0;
       cout << "Initializing Fluxes" << endl;
+      float prob_matrix[500][1000];
+      import_probability("probability_planet.csv", prob_matrix);
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){
-          if(asArray[i][k].isSE){
-            asArray[i][k].neutrinoUFlux=(6.)*(asArray[i][k].abundanceU*1e-9)*(0.9927)*(4.916*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(238.051*1.661e-27);
-            asArray[i][k].neutrinoThFlux=(4.)*(asArray[i][k].abundanceTh*1e-9)*(1.)*(1.563*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(235.044*1.661e-27);
-            asArray[i][k].neutrinoFlux=  asArray[i][k].neutrinoUFlux+asArray[i][k].neutrinoThFlux;
+          float prob =1.;
+          if(oscillated){
+            prob = prob_matrix[i][k];
+            asArray[i][k].meanSurvProb=prob;
+            //cout << prob << " , " << i << " , "<< k << endl;
+          }
+          if(asArray[i][k].isMantle){
+            asArray[i][k].neutrinoUFlux=prob*(6.)*(asArray[i][k].abundanceU*1e-9)*(0.9927)*(4.916*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(238.051*1.661e-27);
+            asArray[i][k].neutrinoThFlux=prob*(4.)*(asArray[i][k].abundanceTh*1e-9)*(1.)*(1.563*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(235.044*1.661e-27);
+            asArray[i][k].neutrinoFlux=asArray[i][k].neutrinoUFlux+asArray[i][k].neutrinoThFlux;
             asArray[i][k].relativeNeutrinoU=asArray[i][k].neutrinoUFlux/asArray[i][k].neutrinoFlux;
             asArray[i][k].relativeNeutrinoTh=asArray[i][k].neutrinoThFlux/asArray[i][k].neutrinoFlux;
-            totalFlux+=asArray[i][k].neutrinoFlux;
           }
           else{
             asArray[i][k].neutrinoUFlux=0;
@@ -745,6 +345,8 @@ i=0;
             asArray[i][k].relativeNeutrinoU=0;
             asArray[i][k].relativeNeutrinoTh=0;
           }
+          totalFlux+=asArray[i][k].neutrinoFlux;
+
         }
       }
       for(int i=0;i<N/2;i++){
@@ -825,6 +427,7 @@ i=0;
         }
       }
     }
+
     /*
     void simulateProbabilities(){
       cout << "Simulating Oscillations" << endl;
@@ -862,9 +465,9 @@ i=0;
       Planet::initializeDensity();
       Planet::initializeAbundanceCrust();
       Planet::initializeAbundanceMantle(key, bse_model);
-      Planet::initializeFluxes();
+      Planet::initializeFluxes(0);
       Planet::initializePaths();
-      Planet::initializeEnergySamples();
+      //Planet::initializeEnergySamples();
       //simulateProbabilities();
       cout << "Done" << endl;
     }

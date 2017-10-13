@@ -85,9 +85,11 @@ class Planet{
     void initializeDensity();
     void initializeAbundanceCrust();
     void initializeAbundanceMantle(string key, string bse_model);
-    void initializeFluxes();
+    void initializeFluxes(bool oscillated);
     void initializePaths();
     void initializeEnergySamples();
+    void initializeProbabilities();
     void initialize(string key, string bse_model);
+
 };
 #endif
