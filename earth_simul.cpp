@@ -4,12 +4,9 @@ g++ -fopenmp -o earth_simul.o earth_simul.cpp `gsl-config --cflags --libs`
  */
 #include "earth_simul.h"
 
-const int N = 1000;
 const int N_x=500;
 const int N_z=1000;
-const int PREM_len = 187;
-const int totalNeutrinos=10000000;
-const int path_resolution = 50; //km
+ //km
 int counter =0;
 const float R_earth = 6371.;
 float dz = 2*R_earth/N;
@@ -189,8 +186,12 @@ float density_to_potential(float dty, bool antineutrino){
       volume = 2*PI*x*dx*dz;
       return volume;
     }
-    void Planet::Planet::Planet::initializeCoords(){
+    void Planet::Planet::Planet::initializeCoords(bool expo){
       cout << "Initializing Coordinates" << endl;
+      ofstream export_file;
+      if(expo){
+        export_file.open("planet_coords.csv");
+      }
       for(int i =0 ; i<N/2;i++){
         for(int k = 0;k<N;k++){
           asArray[i][k].x=i*dx;
@@ -202,6 +203,9 @@ float density_to_potential(float dty, bool antineutrino){
             float di=-i;
             if(r>3480){
               asArray[i][k].isSE=1;
+              if(expo){
+                export_file << i << ' ' << k <<' ' << 1 << endl;
+              }
               if(r>(R_earth-42.5)){
                 asArray[i][k].isCrust=1;
                 asArray[i][k].isMantle=0;
@@ -219,6 +223,10 @@ float density_to_potential(float dty, bool antineutrino){
           float dummy_sa = asArray[i][k].getSolidAngle();
           float dummy_vol = asArray[i][k].getVolume();
         }
+
+      }
+      if(expo){
+        export_file.close();
       }
     }
     void Planet::initializeDensity(){
@@ -333,7 +341,7 @@ float density_to_potential(float dty, bool antineutrino){
           }
           if(asArray[i][k].isMantle){
             asArray[i][k].neutrinoUFlux=prob*(6.)*(asArray[i][k].abundanceU*1e-9)*(0.9927)*(4.916*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(238.051*1.661e-27);
-            asArray[i][k].neutrinoThFlux=prob*(4.)*(asArray[i][k].abundanceTh*1e-9)*(1.)*(1.563*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(235.044*1.661e-27);
+            asArray[i][k].neutrinoThFlux=prob*(4.)*(asArray[i][k].abundanceTh*1e-9)*(1.)*(1.563*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(232.038*1.661e-27);
             asArray[i][k].neutrinoFlux=asArray[i][k].neutrinoUFlux+asArray[i][k].neutrinoThFlux;
             asArray[i][k].relativeNeutrinoU=asArray[i][k].neutrinoUFlux/asArray[i][k].neutrinoFlux;
             asArray[i][k].relativeNeutrinoTh=asArray[i][k].neutrinoThFlux/asArray[i][k].neutrinoFlux;
@@ -359,13 +367,39 @@ float density_to_potential(float dty, bool antineutrino){
         }
       }
     }
-    void Planet::initializePaths(){
+    void Planet::initializePaths(bool all, int i_o, int k_o){
       cout << "Initializing Potential (density) paths" << endl;
       omp_set_num_threads(4);
       int i, k;
-      for(i=0;i<N/2;i++){
-        for(k=0;k<N;k++){
-          if(asArray[i][k].isSE){
+      if(all){
+        for(i=0;i<N/2;i++){
+          for(k=0;k<N;k++){
+            if(asArray[i][k].isSE){
+              float z, x;
+              z=asArray[i][k].z;
+              x=asArray[i][k].x;
+              vector<float> path;
+              float path_len = get_r(R_earth-z,x );
+              asArray[i][k].distanceToDetector=path_len;
+              float element_num = roundf(path_len/path_resolution);
+              asArray[i][k].pathLen=element_num;
+              path.reserve(int(element_num));
+              vector<float> times;
+              times=linspace(0, path_len/300000, int(element_num));
+              for(int n=0;n<int(element_num);n++){
+                float t = times[n];
+                float dty = density_polynomials(get_r(the_r(x, z, t, 'x'), the_r(x, z, t, 'z')));
+                path.push_back(density_to_potential(dty, 1)); //eV
+                }
+              asArray[i][k].path=path;
+            }
+          }
+        }
+      }
+        else{
+          i=i_o;
+          k=k_o;
+          if(asArray[i][k].isEarth){
             float z, x;
             z=asArray[i][k].z;
             x=asArray[i][k].x;
@@ -384,9 +418,12 @@ float density_to_potential(float dty, bool antineutrino){
               }
             asArray[i][k].path=path;
           }
+          else{
+            cout << "ERROR\nPaths cannot be initialized outside the planet."<<endl;
+          }
         }
       }
-    }
+
     void Planet::initializeEnergySamples(){
       cout << "Initializing Energies for Neutrinos" << endl;
       float *uran_energy_repo;
@@ -461,12 +498,12 @@ float density_to_potential(float dty, bool antineutrino){
 
     void Planet::initialize(string key, string bse_model){
       cout << "Building Planet" << endl;
-      Planet::initializeCoords();
+      Planet::initializeCoords(0);
       Planet::initializeDensity();
       Planet::initializeAbundanceCrust();
       Planet::initializeAbundanceMantle(key, bse_model);
       Planet::initializeFluxes(0);
-      Planet::initializePaths();
+      Planet::initializePaths(1, 0, 0);
       //Planet::initializeEnergySamples();
       //simulateProbabilities();
       cout << "Done" << endl;

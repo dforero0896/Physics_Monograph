@@ -4,7 +4,6 @@ g++ -fopenmp -o test_simul.o earth_simul.cpp test_simul.cpp `gsl-config --cflags
 #include "earth_simul.h"
 #include <iostream>
 using namespace std;
-int N =1000;
 
 int main(int argc, char const *argv[]) {
   Planet *earth = new Planet();

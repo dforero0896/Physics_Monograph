@@ -15,7 +15,10 @@ using namespace std;
 #include <sys/time.h>
 #include "omp.h"
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
+const int PREM_len = 187;
+const int totalNeutrinos=10000000;
+const int path_resolution = 50;
+const int N = 1000;
 
 
 extern const int N_x;
@@ -81,12 +84,12 @@ class Planet{
     float mantleMass;
     float totalFlux;
     int totalNeut;
-    void initializeCoords();
+    void initializeCoords(bool expo);
     void initializeDensity();
     void initializeAbundanceCrust();
     void initializeAbundanceMantle(string key, string bse_model);
     void initializeFluxes(bool oscillated);
-    void initializePaths();
+    void initializePaths(bool all, int i, int k);
     void initializeEnergySamples();
     void initializeProbabilities();
     void initialize(string key, string bse_model);

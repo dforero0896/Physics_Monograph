@@ -8,6 +8,7 @@ int N =1000;
 int main(int argc, char const *argv[]) {
   Planet *earth = new Planet();
   earth -> initializeCoords();
+  
   for(int i =0 ; i<500;i++){
     for(int k = 0;k<N;k++){
       if(earth->asArray[i][k].isSE){
