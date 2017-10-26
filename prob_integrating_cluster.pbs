@@ -45,6 +45,7 @@ module load anaconda/python2
 
 
 #Run the stuff
+cd $TEMP_DIR
 python prob_integrating.py
 
 cd $OUT_DIR
