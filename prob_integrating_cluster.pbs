@@ -12,7 +12,7 @@
 #PBS -m abe
 #PBS -N test1_earth_simul
 #PBS -j oe
-#PBS -o earth_simul_out.txt
+#PBS -o prob_integrating_cluster.txt
 
 # Create a temporary directory locally on the node optimizes I/O performance
 TEMP_DIR=/state/partition1/$USER/$PBS_JOBNAME.$PBS_JOBID
@@ -24,22 +24,28 @@ OUT_DIR=$PBS_O_WORKDIR/results
 mkdir -p $TEMP_DIR
 mkdir -p $OUT_DIR
 cp -Rf $PBS_O_WORKDIR/earth_simul.cpp $TEMP_DIR/.
-cp -Rf $PBS_O_WORKDIR/spectra_sampling_MCMC.cpp $TEMP_DIR/.
-#cp -Rf $PBS_O_WORKDIR/energy_repo_232Th.knt $TEMP_DIR/.
-#cp -Rf $PBS_O_WORKDIR/energy_repo_238U.knt $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/earth_simul.h $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/uandino.cpp $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/uandino.h $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/prob_weight.cpp $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/raw_probs.cpp $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/planet_coords.csv $TEMP_DIR/.
+
+
+
+
+
+
+
+
+module load openmpi
+module load gcc
+module load libs/gsl
+module load anaconda/python2
 
 
 #Run the stuff
-
-mpic++ -o spectra_sampling_MCMC.o spectra_sampling_MCMC.cpp `gsl-config --cflags --libs`
-
-mpirun -n 2 ./spectra_sampling_MCMC.o
-
-g++ -fopenmp -o earth_simul.o earth_simul.cpp `gsl-config --cflags --libs`
-
-./earth_test.o
-
-
+python prob_integrating.py
 
 cd $OUT_DIR
 mv -f $TEMP_DIR ./
