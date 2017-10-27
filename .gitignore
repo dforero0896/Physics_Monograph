@@ -9,4 +9,5 @@ tikz*
 *.toc
 *.blg
 *.knt
-/.ipynb_checkpoints
+.*
+!/.gitignore
