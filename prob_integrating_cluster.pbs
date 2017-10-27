@@ -31,7 +31,8 @@ cp -Rf $PBS_O_WORKDIR/prob_weight.cpp $TEMP_DIR/.
 cp -Rf $PBS_O_WORKDIR/raw_probs.cpp $TEMP_DIR/.
 cp -Rf $PBS_O_WORKDIR/planet_coords.csv $TEMP_DIR/.
 cp -Rf $PBS_O_WORKDIR/prob_integrating.py $TEMP_DIR/
-
+cp -Rf $PBS_O_WORKDIR/AntineutrinoSpectrum_232Th.knt $TEMP_DIR
+cp -Rf $PBS_O_WORKDIR/AntineutrinoSpectrum_238U.knt $TEMP_DIR
 
 
 
