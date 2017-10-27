@@ -7,10 +7,10 @@
 # For example if we need 8 intel processors and 64GB or RAM for one week in one node.
 #PBS -l nodes=1:ppn=8
 #PBS -l mem=32gb
-#PBS -l walltime=00:00:60:00
+#PBS -l walltime=00:05:00:00
 #PBS -M df.forero10@uniandes.edu.co
 #PBS -m abe
-#PBS -N test1_earth_simul
+#PBS -N oscillation_big_test
 #PBS -j oe
 #PBS -o prob_integrating_cluster.txt
 
@@ -30,7 +30,7 @@ cp -Rf $PBS_O_WORKDIR/uandino.h $TEMP_DIR/.
 cp -Rf $PBS_O_WORKDIR/prob_weight.cpp $TEMP_DIR/.
 cp -Rf $PBS_O_WORKDIR/raw_probs.cpp $TEMP_DIR/.
 cp -Rf $PBS_O_WORKDIR/planet_coords.csv $TEMP_DIR/.
-
+cp -Rf $PBS_O_WORKDIR/prob_integrating.py $TEMP_DIR/
 
 
 
@@ -47,6 +47,7 @@ module load anaconda/python2
 #Run the stuff
 cd $TEMP_DIR
 python prob_integrating.py
+mv probapility_planet.csv $OUT_DIR
 
 cd $OUT_DIR
 mv -f $TEMP_DIR ./

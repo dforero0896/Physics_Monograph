@@ -1,0 +1,27 @@
+Initializing Coordinates
+Initializing Density
+Initializing Abundances in the Crust
+Initializing Abundances in the Mantle
+111.99
+3911.79
+gsl: interp.c:83: ERROR: x values must be strictly increasing
+Default GSL error handler invoked.
+Initializing Coordinates
+Initializing Density
+Initializing Abundances in the Crust
+Initializing Abundances in the Mantle
+111.99
+3911.79
+Initializing Potential (density) paths
+255
+['0.0006', '4.5004', '300', 'two_layer', 'geodyn', '1', '1']
+Traceback (most recent call last):
+  File "prob_integrating.py", line 35, in <module>
+    data_W=np.loadtxt('prob_weight.dat', dtype=float)
+  File "/lustre/apps/anaconda/2/lib/python2.7/site-packages/numpy/lib/npyio.py", line 896, in loadtxt
+    fh = iter(open(fname, 'U'))
+IOError: [Errno 2] No such file or directory: 'prob_weight.dat'
+mv: cannot stat `probapility_planet.csv': No such file or directory
+
+
+(hpcstats) Getting modules
