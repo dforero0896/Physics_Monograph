@@ -3,17 +3,19 @@ g++ -fopenmp -o test_simul.o earth_simul.cpp test_simul.cpp `gsl-config --cflags
 */
 #include "earth_simul.h"
 #include <iostream>
+#include <cmath>
 using namespace std;
 
 int main(int argc, char const *argv[]) {
   Planet *earth = new Planet();
-
-  earth->Planet::initialize("two_layer", "cosmo");
+  earth->Planet::initialize("two_layer", "geoch");
   cout << "total flux " << earth->totalFlux << endl;
   //cout << "crust mass " << earth->crustMass << endl;
   //cout << "mantle mass " << earth->mantleMass << endl;
   earth->Planet::initializeFluxes(1);
   cout << "total oscillated flux " << earth->totalFlux << endl;
+  cout << "total oscillated Th flux " << earth->totalThFlux << endl;
+  cout << "total oscillated U flux " << earth->totalUFlux << endl;
   ofstream outfile;
   outfile.open("earth_simul_plots.csv");
   for(int k=0;k<N;k++){
@@ -39,7 +41,7 @@ ytest=998;
   sum_test2=0;
   for(int k=0;k<N;k++){
     for(int i =0 ; i<N/2;i++){
-      if(earth->asArray[i][k].isMantle){
+      if(earth->asArray[i][k].isEarth){//integrate over the whole Earth
         float x= earth->asArray[i][k].x;
         float z = earth->asArray[i][k].z;
         sum_test2+=earth->asArray[i][k].volume*earth->asArray[i][k].solidAngle;
@@ -47,13 +49,9 @@ ytest=998;
       else{;}
     }
   }
-  cout << "variables test " << sum_test2 << endl;
-  sum_test1=0;
+  cout << "integral over whole Earth " << sum_test2 << endl;
+  cout << "fraction of Earth " << sum_test2/6371 << endl;
 
-for(int n=0;n<10000;n++){
-  sum_test1+=(1.-pow(0.45, 2.*n+3.))/((2.*n+1.)*(2.*n+3.));
-}
-cout << "legendre pols test  " << sum_test1 << endl;
 
   //cout << "an energy " << (earth->asArray[xtest][ytest].allowedEnergiesU[30]) << endl;
   //cout << "the prob " << calculateProbability(test_N, earth->asArray[xtest][ytest].path, (earth->asArray[xtest][ytest].allowedEnergiesU[30])) << endl;

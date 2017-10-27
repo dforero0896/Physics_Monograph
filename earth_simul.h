@@ -83,6 +83,8 @@ class Planet{
     float crustMass;
     float mantleMass;
     float totalFlux;
+    float totalUFlux;
+    float totalThFlux;
     int totalNeut;
     void initializeCoords(bool expo);
     void initializeDensity();

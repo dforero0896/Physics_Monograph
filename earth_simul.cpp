@@ -178,7 +178,7 @@ float density_to_potential(float dty, bool antineutrino){
       return r;
     }
     float RingNode::getSolidAngle(){
-      solidAngle = (1./((R_earth-z)*(R_earth-z) + x*x));
+      solidAngle = (1./(4.*PI))*(1./((R_earth-z)*(R_earth-z) + x*x));
       return solidAngle;
     }
     float volume;
@@ -296,7 +296,6 @@ float density_to_potential(float dty, bool antineutrino){
       else if(key=="two_layer"){
         float bulk_mantle_U = calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceU_BSE, 453.193965399)[model];
         float bulk_mantle_Th = calculateMantleAbundances(crustMass, mantleMass, crustMass+mantleMass, abundanceTh_BSE, 1940.64130183)[model];
-        cout << bulk_mantle_Th << endl;
         float mantleMass_fraction = 0.1*mantleMass;
         float mass_count=0;
         float limit_rad;
@@ -309,7 +308,6 @@ float density_to_potential(float dty, bool antineutrino){
           }
           n++;
         } while(mass_count<=mantleMass_fraction);
-        cout << limit_rad << endl;
         for(int i =0 ; i<N/2;i++){
           for(int k = 0;k<N;k++){
             if(asArray[i][k].isMantle && asArray[i][k].r>limit_rad){
@@ -328,6 +326,8 @@ float density_to_potential(float dty, bool antineutrino){
 
     void Planet::initializeFluxes(bool oscillated){
       totalFlux=0;
+      totalUFlux=0;
+      totalThFlux=0;
       cout << "Initializing Fluxes" << endl;
       float prob_matrix[500][1000];
       import_probability("probability_planet.csv", prob_matrix);
@@ -339,7 +339,7 @@ float density_to_potential(float dty, bool antineutrino){
             asArray[i][k].meanSurvProb=prob;
             //cout << prob << " , " << i << " , "<< k << endl;
           }
-          if(asArray[i][k].isMantle){
+          if(asArray[i][k].isMantle){//flux only from the mantle
             asArray[i][k].neutrinoUFlux=prob*(6.)*(asArray[i][k].abundanceU*1e-9)*(0.9927)*(4.916*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(238.051*1.661e-27);
             asArray[i][k].neutrinoThFlux=prob*(4.)*(asArray[i][k].abundanceTh*1e-9)*(1.)*(1.563*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(232.038*1.661e-27);
             asArray[i][k].neutrinoFlux=asArray[i][k].neutrinoUFlux+asArray[i][k].neutrinoThFlux;
@@ -354,7 +354,8 @@ float density_to_potential(float dty, bool antineutrino){
             asArray[i][k].relativeNeutrinoTh=0;
           }
           totalFlux+=asArray[i][k].neutrinoFlux;
-
+          totalUFlux+=asArray[i][k].neutrinoUFlux;
+          totalThFlux+=asArray[i][k].neutrinoThFlux;
         }
       }
       for(int i=0;i<N/2;i++){
@@ -503,7 +504,7 @@ float density_to_potential(float dty, bool antineutrino){
       Planet::initializeAbundanceCrust();
       Planet::initializeAbundanceMantle(key, bse_model);
       Planet::initializeFluxes(0);
-      Planet::initializePaths(1, 0, 0);
+      //Planet::initializePaths(1, 0, 0);
       //Planet::initializeEnergySamples();
       //simulateProbabilities();
       cout << "Done" << endl;
