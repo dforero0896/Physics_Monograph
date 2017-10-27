@@ -46,8 +46,8 @@ int main(int argc, char const *argv[]) {
   if(factor_norm==0){
     factor_norm++;
   }
-  string filenameU = "../Models/AntineutrinoSpectrum_all/AntineutrinoSpectrum_238U.knt";
-  string filenameTh = "../Models/AntineutrinoSpectrum_all/AntineutrinoSpectrum_232Th.knt";
+  string filenameU = "AntineutrinoSpectrum_238U.knt";
+  string filenameTh = "AntineutrinoSpectrum_232Th.knt";
   double spectrumU[4500][2];
   read_file_into_2D_array(filenameU, spectrumU);
   double spectrumTh[4500][2];
