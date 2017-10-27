@@ -9,5 +9,4 @@ tikz*
 *.toc
 *.blg
 *.knt
-.ipynb_checkpoints/
-**/*.ipynb_checkpoints/
+/.ipynb_checkpoints
