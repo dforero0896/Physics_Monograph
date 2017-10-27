@@ -19,6 +19,7 @@ int main(int argc, char const *argv[]) {
       string this_bse = bse_models[m];
       Planet *earth = new Planet();
       earth->Planet::initialize(this_dist, this_bse);
+      earth->Planet::initializeFluxes(1);
       outfile << "["<<earth->totalUFlux<<","<<earth->totalThFlux<<"]" << ";";
       delete earth;
     }

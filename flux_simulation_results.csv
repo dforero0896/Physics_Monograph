@@ -1,5 +1,5 @@
 #Columns correspond to geoch, geodyn, cosmo BSE models
 #Rows correspond to the uniform and two_layer HPE mantle distributions.
 #There are tuples in each component that are [Uflux, Thflux]
-[1.13792,0.959665];[2.44504,2.10499];[0.440778,0.253386];[0,0]
-[0.964031,0.793471];[1.96181,1.6677];[0.431908,0.254363];[0,0]
+[0.625847,0.527817];[1.34478,1.15775];[0.242431,0.139364];[0,0]
+[0.530216,0.436411];[1.07898,0.917229];[0.237548,0.1399];[0,0]
