@@ -9,5 +9,4 @@ tikz*
 *.toc
 *.blg
 *.knt
-.*
-!/.gitignore
+
