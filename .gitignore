@@ -9,4 +9,4 @@ tikz*
 *.toc
 *.blg
 *.knt
-*.o
+*/**/*.o
