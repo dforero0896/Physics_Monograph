@@ -330,6 +330,11 @@ float density_to_potential(float dty, bool antineutrino){
       totalThFlux=0;
       cout << "Initializing Fluxes" << endl;
       float prob_matrix[500][1000];
+      for(int n=0;n<N/2;n++){
+        for(int m = 0;m<N;m++){
+          prob_matrix[n][m]=0;
+        }
+      }
       import_probability("probability_planet.csv", prob_matrix);
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){

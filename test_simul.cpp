@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]) {
   outfile.open("earth_simul_plots.csv");
   for(int k=0;k<N;k++){
     for(int i =0 ; i<N/2;i++){
-      outfile << earth->asArray[i][k].isEarth*earth->asArray[i][k].neutrinoFlux << ',' ;
+      outfile << earth->asArray[i][k].isEarth*earth->asArray[i][k].abundanceTh << ',' ;
       }
       outfile <<0<< endl;
     }
