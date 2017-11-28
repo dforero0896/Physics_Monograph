@@ -8,7 +8,7 @@ using namespace std;
 
 int main(int argc, char const *argv[]) {
   Planet *earth = new Planet();
-  earth->Planet::initialize("two_layer", "geoch");
+  earth->Planet::initialize("unif", "geoch");
   cout << "total flux " << earth->totalFlux << endl;
   //cout << "crust mass " << earth->crustMass << endl;
   //cout << "mantle mass " << earth->mantleMass << endl;
@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]) {
   outfile.open("earth_simul_plots.csv");
   for(int k=0;k<N;k++){
     for(int i =0 ; i<N/2;i++){
-      outfile << earth->asArray[i][k].isEarth*earth->asArray[i][k].r << ',' ;
+      outfile << earth->asArray[i][k].isEarth*earth->asArray[i][k].abundanceU << ',' ;
       }
       outfile <<0<< endl;
     }
