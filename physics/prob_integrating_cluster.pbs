@@ -1,0 +1,55 @@
+# This tells the terminal to use bash as the interpreter
+#!/bin/bash
+# This is a comment. The heading of the script must include
+# instructions to the scheduler. The arguments begin with #PBS and
+# the options
+# First we need to stablish the name of the queue we will utilize.
+# For example if we need 8 intel processors and 64GB or RAM for one week in one node.
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=32gb
+#PBS -l walltime=00:05:00:00
+#PBS -M df.forero10@uniandes.edu.co
+#PBS -m abe
+#PBS -N oscillation_big_test
+#PBS -j oe
+#PBS -o prob_integrating_cluster.txt
+
+# Create a temporary directory locally on the node optimizes I/O performance
+TEMP_DIR=/state/partition1/$USER/$PBS_JOBNAME.$PBS_JOBID
+# Create the directory to store the computation output. For example
+# results inside the working directory.
+OUT_DIR=$PBS_O_WORKDIR/results
+
+
+mkdir -p $TEMP_DIR
+mkdir -p $OUT_DIR
+cp -Rf $PBS_O_WORKDIR/earth_simul.cpp $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/earth_simul.h $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/uandino.cpp $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/uandino.h $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/prob_weight.cpp $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/raw_probs.cpp $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/planet_coords.csv $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/prob_integrating.py $TEMP_DIR/
+cp -Rf $PBS_O_WORKDIR/AntineutrinoSpectrum_232Th.knt $TEMP_DIR
+cp -Rf $PBS_O_WORKDIR/AntineutrinoSpectrum_238U.knt $TEMP_DIR
+
+
+
+
+
+
+module load openmpi
+module load gcc
+module load libs/gsl
+module load anaconda/python2
+
+
+#Run the stuff
+cd $TEMP_DIR
+python prob_integrating.py
+mv probapility_planet.csv $OUT_DIR
+
+cd $OUT_DIR
+mv -f $TEMP_DIR ./
+
