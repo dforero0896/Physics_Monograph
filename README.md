@@ -1,7 +1,7 @@
 # Physics_Monograph
 Contains the files related to my thesis/monography project for the physics and geoscience major at Universidad de Los Andes.
-
-See the document [here](https://github.com/dforero0896/Physics_Monograph/blob/master/document/Thesis_Document.pdf), and the presentation [here](https://github.com/dforero0896/Physics_Monograph/blob/master/document/thesis_presentation.pdf).
+## Geoscience:
+See the document [here](https://github.com/dforero0896/Physics_Monograph/blob/master/geoscience/document/Thesis_Document.pdf), and the presentation [here](https://github.com/dforero0896/Physics_Monograph/blob/master/geoscience/document/thesis_presentation.pdf).
 
 ## References.
 + Tarbuck, E. J., Lutgens, F. K., Tasa, D., AMR traducciones científicas, J, T. E., Lutgens, F. K., … Lutgens, F. K. (2005). Ciencias de la tierra una introducción a la geología física.
