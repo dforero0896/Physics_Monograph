@@ -5,12 +5,12 @@
 # the options
 # First we need to stablish the name of the queue we will utilize.
 # For example if we need 8 intel processors and 64GB or RAM for one week in one node.
-#PBS -l nodes=1:ppn=8
-#PBS -l mem=32gb
-#PBS -l walltime=00:05:00:00
+#PBS -l nodes=4:ppn=32
+#PBS -l mem=128gb
+#PBS -l walltime=00:50:00:00
 #PBS -M df.forero10@uniandes.edu.co
 #PBS -m abe
-#PBS -N oscillation_big_test
+#PBS -N phys_all_probs_stepLen-4
 #PBS -j oe
 #PBS -o prob_integrating_cluster.txt
 
@@ -48,7 +48,7 @@ module load anaconda/python2
 #Run the stuff
 cd $TEMP_DIR
 python prob_integrating.py
-mv probapility_planet.csv $OUT_DIR
+cp probapility_planet.csv $OUT_DIR
 
 cd $OUT_DIR
 mv -f $TEMP_DIR ./

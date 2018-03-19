@@ -9,6 +9,8 @@ using namespace std;
 int main(int argc, char const *argv[]) {
   Planet *earth = new Planet();
   earth->Planet::initialize("unif", "geoch");
+  earth->Planet::initializePaths(0,2,1);
+  cout << "distance " << earth->asArray[2][1].path[100000000] << endl;
   cout << "total flux " << earth->totalFlux << endl;
   //cout << "crust mass " << earth->crustMass << endl;
   //cout << "mantle mass " << earth->mantleMass << endl;

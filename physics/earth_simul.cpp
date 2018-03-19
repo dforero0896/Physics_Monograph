@@ -440,7 +440,6 @@ float density_to_potential(float dty, bool antineutrino){
       //cout << thor_energy_repo[9999239] << ',' << uran_energy_repo[9935793] << endl;
       int uran_i=0;
       int thor_i=0;
-      omp_set_num_threads(4);
       int i, k, n, m;
       for(i=0;i<N/2;i++){
         for(k=0;k<N;k++){
