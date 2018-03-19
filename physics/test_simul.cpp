@@ -14,7 +14,7 @@ int main(int argc, char const *argv[]) {
   cout << "total flux " << earth->totalFlux << endl;
   //cout << "crust mass " << earth->crustMass << endl;
   //cout << "mantle mass " << earth->mantleMass << endl;
-  earth->Planet::initializeFluxes(1);
+  earth->Planet::initializeFluxes(1, "two_layer", "geodyn");
   cout << "total oscillated flux " << earth->totalFlux << endl;
   cout << "total oscillated Th flux " << earth->totalThFlux << endl;
   cout << "total oscillated U flux " << earth->totalUFlux << endl;

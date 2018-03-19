@@ -325,7 +325,7 @@ float density_to_potential(float dty, bool antineutrino){
       }
     }
 
-    void Planet::initializeFluxes(bool oscillated){
+    void Planet::initializeFluxes(bool oscillated, string hpe_dist, string bse_model){
       totalFlux=0;
       totalUFlux=0;
       totalThFlux=0;
@@ -336,7 +336,7 @@ float density_to_potential(float dty, bool antineutrino){
           prob_matrix[n][m]=0;
         }
       }
-      import_probability("probability_planet.csv", prob_matrix);
+      import_probability("probability_planet"+hpe_dist+"_"+bse_model+".csv", prob_matrix);
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){
           float prob =1.;
@@ -508,7 +508,7 @@ float density_to_potential(float dty, bool antineutrino){
       Planet::initializeDensity();
       Planet::initializeAbundanceCrust();
       Planet::initializeAbundanceMantle(key, bse_model);
-      Planet::initializeFluxes(0);
+      Planet::initializeFluxes(0, key, bse_model);
       //Planet::initializePaths(1, 0, 0);
       //Planet::initializeEnergySamples();
       //simulateProbabilities();

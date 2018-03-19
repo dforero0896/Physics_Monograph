@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]) {
       string this_bse = bse_models[m];
       Planet *earth = new Planet();
       earth->Planet::initialize(this_dist, this_bse);
-      earth->Planet::initializeFluxes(1);
+      earth->Planet::initializeFluxes(1, this_dist, this_bse);
       //outfile << "["<<earth->totalUFlux*4.07+ earth->totalThFlux*12.8<<"]" << ";";
       //outfile << "["<<earth->totalUFlux*4.07<< "&" << earth->totalThFlux*12.8<<"]" << ";";
       outfile << bse_models[m] << " ["<<earth->totalUFlux<< "," << earth->totalThFlux<<"]" << "\n";
