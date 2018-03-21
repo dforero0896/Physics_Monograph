@@ -1,0 +1,14 @@
+Initializing Coordinates
+Initializing Density
+Initializing Abundances in the Crust
+Initializing Abundances in the Mantle
+Initializing Potential (density) paths
+1272926
+
+real	1m1.035s
+user	11m3.731s
+sys	0m1.600s
+<class 'matplotlib.figure.Figure'>
+
+
+(hpcstats) Getting modules
