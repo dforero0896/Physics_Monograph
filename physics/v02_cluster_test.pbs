@@ -10,7 +10,7 @@
 #PBS -l walltime=00:20:00:00
 #PBS -M df.forero10@uniandes.edu.co
 #PBS -m abe
-#PBS -N real_earth_diameter_test_200E_500KS_32ppn_3n_fixed
+#PBS -N real_earth_diameter_test_200E_500KS_arrayPath
 #PBS -j oe
 #PBS -o out_$PBS_JOBNAME.txt
 

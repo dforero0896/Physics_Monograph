@@ -432,18 +432,15 @@ void calculateProbabilities(){
   float coord_end = 6371.;
 
   int N=200; //Number of energy steps.
-	int Steps=500000; //Number of spatial steps.
-  float step_len = float(abs(coord_end-coord_init))/Steps; //Longitude of each step in km.
-  cout << "each step is: " << step_len << endl;
-  /*//Save a logspaced array with the energies.
-	double EnergyLins[N];
-	vector<double> exps = linspace(2, 7, N);
-	for(int i=0;i<N;i++){
-		EnergyLins[i]=pow(10, exps[i]);
-	}
-*/
+	//int Steps=500000; //Number of spatial steps.
+  //float step_len = float(abs(coord_end-coord_init))/Steps; //Longitude of each step in km.
+//  cout << "each step is: " << step_len << endl;
+  Planet *earth = new Planet();
+  int test_i=1;
+  int test_k=1;
+  earth->initializePaths(0,test_i,test_k);
   vector<double> EnergyLins = linspace(500, 4.5e6, N);
-
+  int Steps = int(earth->asArray[test_i][test_k].pathLen);
 	//omp_set_num_threads(4);//Number of threads to use.
 	int i,k;
 
@@ -462,13 +459,13 @@ void calculateProbabilities(){
     double coord = coord_init;
 		//#pragma omp parallel for private(k)
     for(k=0;k<Steps;k++){
-	    double density=density_to_potential(density_polynomials(coord),1); //eV
+	    double density=earth->asArray[test_i][test_k].path[k]; //eV
       //double density = density_to_potential(sun_rho(coord),0);
       //Increase coordinate value.
-      coord += step_len;
+      //coord += step_len;
       //A matrix to store the operator for this step.
 	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
-	    calculateOperator(energy, density, longitude_units_conversion(step_len),iter_operator);
+	    calculateOperator(energy, density, longitude_units_conversion(path_resolution),iter_operator);
 	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
       //Copy operator product so far.
 	    copy_to_complex_from_complex(operator_product, operator_product_copy);
@@ -543,11 +540,11 @@ void calculateProbabilities(){
   potentialfile.open("potentialTest.csv");
   double coord = coord_init;
   for(k=0;k<Steps;k+=1000){
-    coord = coord_init + k*step_len;
-    potentialfile << density_to_potential(density_polynomials(coord),1) << endl;
+    //coord = coord_init + k*step_len;
+    potentialfile << earth->asArray[test_i][test_k].path[k] << endl;
   }
   potentialfile.close();
-
+ delete earth;
 }
 int main(int argc, char const *argv[]) {
 		calculateProbabilities();

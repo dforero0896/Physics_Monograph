@@ -377,7 +377,6 @@ float density_to_potential(float dty, bool antineutrino){
     }
     void Planet::initializePaths(bool all, int i_o, int k_o){
       cout << "Initializing Potential (density) paths" << endl;
-      omp_set_num_threads(4);
       int i, k;
       if(all){
         for(i=0;i<N/2;i++){
