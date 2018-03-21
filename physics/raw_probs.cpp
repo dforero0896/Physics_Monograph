@@ -41,5 +41,7 @@ int main(int argc, char const *argv[]) {
 
   calculateProbabilities(earth->asArray[i][k].path, Steps, path_len, E_min, E_max );
 
+  
+
   return 0;
 }

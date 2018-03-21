@@ -1,0 +1,55 @@
+# This tells the terminal to use bash as the interpreter
+#!/bin/bash
+# This is a comment. The heading of the script must include
+# instructions to the scheduler. The arguments begin with #PBS and
+# the options
+# First we need to stablish the name of the queue we will utilize.
+# For example if we need 8 intel processors and 64GB or RAM for one week in one node.
+#PBS -l nodes=3:ppn=32
+#PBS -l mem=128gb
+#PBS -l walltime=00:20:00:00
+#PBS -M df.forero10@uniandes.edu.co
+#PBS -m abe
+#PBS -N real_earth_diameter_test_500E_500KS_32ppn_3n_fixed
+#PBS -j oe
+#PBS -o out_$PBS_JOBNAME.txt
+
+# Create a temporary directory locally on the node optimizes I/O performance
+TEMP_DIR=/state/partition1/$USER/$PBS_JOBNAME.$PBS_JOBID
+# Create the directory to store the computation output. For example
+# results inside the working directory.
+OUT_DIR=$PBS_O_WORKDIR/results
+
+
+mkdir -p $TEMP_DIR
+mkdir -p $OUT_DIR
+cp -Rf $PBS_O_WORKDIR/uandino_v02.cpp $TEMP_DIR/.
+#cp -Rf $PBS_O_WORKDIR/uandino_v02.o $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/plotTheThing.py $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/earth_simul.cpp $TEMP_DIR/.
+cp -Rf $PBS_O_WORKDIR/earth_simul.h $TEMP_DIR/.
+
+
+
+
+
+module load openmpi
+module load gcc
+module load libs/gsl
+module load anaconda/python2
+
+#Run the stuff
+cd $TEMP_DIR
+g++ -fopenmp -o uandino_v02.o earth_simul.cpp uandino_v02.cpp `gsl-config --cflags --libs`
+
+time ./uandino_v02.o
+
+python plotTheThing.py
+
+
+cp probsTest.csv $OUT_DIR
+cp potentialTest.csv $OUT_DIR
+
+
+cd $OUT_DIR
+mv -f $TEMP_DIR ./
