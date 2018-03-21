@@ -289,11 +289,13 @@ void calculateOperator(double neutrinoEnergy, double A, double L, gsl_matrix_com
   gsl_matrix_free(T_sq_flav_mat);
 }
 void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, float E_max){
-  //CKM matrix elements calculated just once.
-	double theta1 = 0.7222;
-	double theta2 = 0.1468;
-	double theta3 = 0.5764;
-	Ue1 = gsl_sf_cos(theta2)*gsl_sf_cos(theta3);
+  /*Writes a file with energies and all three probabilities*/
+
+  double theta1 = 0.7222;
+  double theta2 = 0.1468;
+  double theta3 = 0.5764;
+  //*/
+  Ue1 = gsl_sf_cos(theta2)*gsl_sf_cos(theta3);
   Ue2 = gsl_sf_sin(theta3)*gsl_sf_cos(theta2);
   Ue3 = gsl_sf_sin(theta2);
   Umu1=-gsl_sf_sin(theta3)*gsl_sf_cos(theta1)-gsl_sf_sin(theta1)*gsl_sf_sin(theta2)*gsl_sf_cos(theta3);
@@ -303,63 +305,72 @@ void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, f
   Ut2=-gsl_sf_sin(theta1)*gsl_sf_cos(theta3)-gsl_sf_sin(theta2)*gsl_sf_sin(theta3)*gsl_sf_cos(theta1);
   Ut3=gsl_sf_cos(theta1)*gsl_sf_cos(theta2);
 
+
   CKM=gsl_matrix_alloc(3, 3);
   fill_real_matrix(CKM, Ue1, Ue2, Ue3, Umu1, Umu2, Umu3, Ut1, Ut2, Ut3);
-	float coord_init = path[0];
-	float coord_end = path[Steps-1];
-
-
-	vector<float> EnergyLins;
-	EnergyLins.reserve(N);
-	EnergyLins = linspace(E_min, E_max, N);
-
-
-	//vector<float> DensityStep = density_array_from_key("fig_4", Steps);
+  //Define spatial limits for the Earth in km.
+  vector<double> EnergyLins = linspace(E_min*1e6, E_max*1e6, N);
+	//omp_set_num_threads(4);//Number of threads to use.
 	int i,k;
-	long double Probabilities[N][3];
+
+	long double Probabilities[N][3];//Array to save probabilities.
 	//double Probabilities[N];
 	#pragma omp parallel for private(i)
-	for(i=0;i<N;i++){
-	  long double energy=1e6*EnergyLins[i];
+	for(i=0;i<N;i++){//For each energy...
+	cout << "using " << omp_get_num_threads() << " cores" << endl;
+	  long double energy=EnergyLins[i];
 	  gsl_matrix *Id =gsl_matrix_alloc(3, 3);
+    //A matrix to save the product of operators.
 	  gsl_matrix_complex *operator_product = gsl_matrix_complex_alloc(3, 3);
 	  generate_real_identity(Id);
 	  copy_to_complex_from_real(Id, operator_product);
     gsl_matrix_free(Id);
-		double coord = coord_init;
-	  for(k=0;k<Steps;k++){
-	    double density=path[k];
-			gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
-	    calculateOperator(energy, density, longitude_units_conversion(path_resol),iter_operator);
+		//#pragma omp parallel for private(k)
+    for(k=0;k<Steps;k++){
+	    double density=path[k]; //eV
+      //double density = density_to_potential(sun_rho(coord),0);
+      //Increase coordinate value.
+      //coord += step_len;
+      //A matrix to store the operator for this step.
+	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
+	    calculateOperator(energy, density, longitude_units_conversion(path_resolution),iter_operator);
 	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
-	    //Copy operator product so far.
+      //Copy operator product so far.
 	    copy_to_complex_from_complex(operator_product, operator_product_copy);
       //Multiply the operator for this step and the copy. Store them in the matrix containing the whole product.
 	    gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, gsl_complex_rect(1., 0), iter_operator, operator_product_copy, gsl_complex_rect(0., 0.),operator_product);
-	    gsl_matrix_complex_free(operator_product_copy);
+
+      //Free memory.
+      gsl_matrix_complex_free(operator_product_copy);
 	    gsl_matrix_complex_free(iter_operator);
+
+
+
 	  }
+
 		//Probabilities[i] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,1));
 		Probabilities[i][0] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0));
 		Probabilities[i][1] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 1,0));
 		Probabilities[i][2] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 2,0));
 		//cout << EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2] << endl;
-		gsl_matrix_complex_free(operator_product);
+    gsl_matrix_complex_free(operator_product);
 
 	}
-	ofstream outfile;
-  outfile.open("raw_probs.csv");
+  //Write file with probabilities
+  ofstream myfile;
+  myfile.open ("raw_probs.csv");
+
 	for(i=0;i<N;i++){
-		outfile << 1e6*EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2]<< endl;
+		myfile << EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2] << endl;
 		//cout << EnergyLins[i] << "," << Probabilities[i] << endl;
 	}
-  outfile.close();
-ofstream potentialfile;
-potentialfile.open("potentialTest.csv");
-	for(int n =0;n< Steps;n+=10){
-		potentialfile   << path[n] << endl;
-	}
-potentialfile.close();
-
-
+ //Write file with potential values.
+  myfile.close();
+  ofstream potentialfile;
+  potentialfile.open("potentialTest.csv");
+  for(k=0;k<Steps;k+=1000){
+    //coord = coord_init + k*step_len;
+    potentialfile << path[k] << endl;
+  }
+  potentialfile.close();
 }
