@@ -1,0 +1,211 @@
+Initializing Coordinates
+Initializing Potential (density) paths
+using using using using using using using using using using using using 32 cores32 cores32using 
+
+using 32using 32 coresusing 3232
+ coresusing 32 coresusing 
+ coresusing 
+
+32323232using 32 cores32using using 32 cores cores
+ coresusing 32 cores
+ cores32using 32 cores
+
+ coresusing 32 cores32
+
+32 coresusing using 
+ coresusing  cores cores32323232
+32 coresusing 32 cores
+ cores cores32 cores
+ cores
+
+
+using  cores32 cores
+
+32 cores
+ cores
+
+using  cores
+using 32 cores
+
+
+
+
+32 cores
+
+using using using using using 32using using 32using using  coresusing using using 3232using using 32 coresusing using using using using using using using using using 32 coresusing 
+32 cores32using  cores
+3232 cores
+32 cores
+323232
+32 coresusing  cores cores
+using 3232323232323232 cores32
+using 32 cores
+using using  cores cores cores
+
+
+32 cores
+ cores
+ cores32 cores32
+ cores cores cores
+ cores
+
+
+ cores
+ cores cores
+ cores
+
+
+
+32 cores
+
+32 cores
+
+32 cores
+
+ cores
+using using using using using using 32using using using using using 3232using using 32 cores
+32using 32using using 32using using using using using  cores
+using using 32 cores
+32 coresusing 32 cores
+32using 323232using  cores
+32using  cores cores cores
+using 32using using 32 cores
+3232
+
+32 cores
+32 cores3232using 32 cores cores32
+ cores cores32 cores32
+32 cores32 cores32 cores
+32 cores
+
+ cores
+ cores
+
+ cores
+ cores cores cores
+
+ cores
+
+
+
+ cores
+
+ cores
+ cores
+
+
+using 32 cores
+using using using 3232 cores coresusing 32 coresusing using using 32using using using 32using using  cores
+using using using 32 coresusing 
+using 32 cores
+using 32using using using 32using  cores32 cores
+using using 32
+
+32using using 32 coresusing 
+ cores
+using using 32using 32 cores
+using 3232
+323232 cores3232 cores
+3232 cores cores
+
+ cores
+ cores cores3232 cores cores cores cores
+
+32 cores
+ cores
+
+
+ cores
+ cores
+ cores
+
+32
+
+ cores
+
+32 cores
+32 cores
+32 cores
+using using using 32 cores32using using using using using using using 32
+using 32 cores
+using 32using using 32 cores
+using  coresusing 32using using using 32using using 32using  cores
+using using using using using  cores
+32 cores
+ cores3232 cores
+32 cores
+32323232using 
+
+32 cores
+ cores32
+32using 32 cores32 cores32 cores
+323232 cores cores
+
+ cores32using 32
+ cores cores cores32
+ cores
+
+ coresusing 
+ cores
+3232
+ cores
+ cores cores cores
+
+ cores
+
+
+
+ cores
+ cores
+using using using using using using 3232using using using using using 32using using using using using 32using using 32 cores
+ coresusing 32 cores
+using using 32 cores
+ cores
+32using 32 cores
+32 cores
+32using  cores3232 cores
+32using  coresusing using  cores
+32 cores
+32using  cores
+323232 cores cores32using 32using using  cores
+32 cores cores
+
+using  cores cores
+32
+3232 cores cores
+ cores32 cores
+
+using  cores
+
+32 cores32
+3232
+
+
+ cores32
+ cores32 cores cores
+
+ cores
+
+ cores
+
+
+using using using 3232using using using 32 cores3232 coresusing using 
+32using  cores
+using 32 cores
+32 cores
+
+3232 cores cores
+ cores
+
+ cores
+ cores
+using 32 cores
+
+real	0m30.868s
+user	3m41.572s
+sys	0m0.420s
+<class 'matplotlib.figure.Figure'>
+cp: cannot stat `probsTest.csv': No such file or directory
+
+
+(hpcstats) Getting modules
