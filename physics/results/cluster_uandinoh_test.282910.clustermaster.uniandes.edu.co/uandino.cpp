@@ -309,7 +309,7 @@ void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, f
   CKM=gsl_matrix_alloc(3, 3);
   fill_real_matrix(CKM, Ue1, Ue2, Ue3, Umu1, Umu2, Umu3, Ut1, Ut2, Ut3);
   //Define spatial limits for the Earth in km.
-  vector<float> EnergyLins = linspace(E_min*1e6, E_max*1e6, N);
+  vector<double> EnergyLins = linspace(E_min*1e6, E_max*1e6, N);
 	//omp_set_num_threads(4);//Number of threads to use.
 	int i,k;
 
