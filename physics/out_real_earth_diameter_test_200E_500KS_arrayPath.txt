@@ -1,0 +1,214 @@
+Initializing Potential (density) paths
+ERROR
+Paths cannot be initialized outside the planet.
+using using using using using using using using using 32using 3232using 32using using 32using using using using using 32 cores
+using using 32 coresusing 
+using using 32 cores
+using using 3232 cores
+3232 cores
+32using 32323232 cores cores32 cores
+using using 3232 cores
+ cores cores
+ cores3232 cores
+ coresusing  cores32 cores
+32 cores cores
+ cores
+using 32 cores
+
+
+ cores32 cores
+ coresusing 
+32 cores
+
+
+
+using 323232
+ cores cores cores
+ cores
+
+
+
+ cores
+
+32 cores
+ cores
+32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using using 32 cores
+using 32 cores32
+ cores
+using 32 cores
+using 32 coresusing 
+using using 3232 cores cores
+
+using 32 cores
+using 32 cores
+using 32 coresusing 
+32 coresusing 32 cores
+using 32 cores
+32 cores
+
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using using 3232 cores cores
+
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using 32 cores
+using using using 3232 coresusing  coresusing 
+using 32using using using 32 cores
+32
+using using using using 32 cores32
+using using using 32using 3232 cores
+ cores coresusing using 32 cores
+32 cores
+
+using 32using 32 cores
+32using 32 cores32using 32 cores
+using using 32 cores
+32using 32 cores
+ cores32 cores coresusing 
+using 
+32 cores
+using 32 cores
+
+using 32using 32 cores
+
+using  coresusing using 32
+ cores
+3232using 32 cores
+using 32 cores
+ cores cores
+32 cores
+
+using using  cores32 cores
+ coresusing 32 cores
+using 32 cores
+using using 3232
+
+using 32 cores
+ cores32 cores
+using  coresusing 32using 32 cores
+ coresusing 32 cores
+32 coresusing 32 cores
+
+32using 32 cores
+ cores
+32
+using 32using using using using 32 cores
+using using  cores cores coresusing 
+using  cores
+using using 
+32 cores
+32 cores323232
+using 32 cores3232 cores
+
+32using  cores
+32 cores cores
+using  cores
+
+
+ coresusing 32using 32 cores
+ cores
+using 32 cores
+using 32 cores
+
+using 32 cores
+
+32 cores
+using using using  coresusing using 32using using 32 cores
+32 cores3232 cores
+using 32 cores
+32
+
+using 32using  cores
+
+3232using 32 cores
+ cores cores32 cores
+using 
+using 32 coresusing using 
+
+32using  cores cores32 cores
+ cores32 cores32 cores
+using 
+ cores
+using  cores32using using 
+
+using using 32
+32 coresusing 
+32using using using using 32 cores
+32 cores
+ coresusing  cores
+using 
+32
+323232
+32using 32 cores
+ cores
+32 cores cores
+using 32 cores
+32using  cores32using 32 cores32
+ cores
+
+ coresusing using  coresusing using 3232
+32
+using  cores32
+ cores cores32 cores
+32 cores
+ cores cores
+
+ coresusing 
+
+32using using  cores
+ coresusing 32
+ cores
+using using 
+
+32 cores
+32using 32 coresusing using 32 cores32
+ cores
+using 3232 cores
+
+using using  cores32
+32 cores
+32using 32 cores cores
+ cores
+
+ cores
+using 32 cores
+
+real	0m0.291s
+user	0m0.297s
+sys	0m0.117s
+plotTheThing.py:45: UserWarning: loadtxt: Empty input file: "potentialTest.csv"
+  pathData = np.loadtxt('potentialTest.csv')
+<class 'matplotlib.figure.Figure'>
+cp: cannot stat `probsTest.csv': No such file or directory
+
+
+(hpcstats) Getting modules
