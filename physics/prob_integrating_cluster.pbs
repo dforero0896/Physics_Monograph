@@ -7,7 +7,7 @@
 # For example if we need 8 intel processors and 64GB or RAM for one week in one node.
 #PBS -l nodes=4:ppn=32
 #PBS -l mem=128gb
-#PBS -l walltime=00:50:00:00
+#PBS -l walltime=00:99:00:00
 #PBS -M df.forero10@uniandes.edu.co
 #PBS -m abe
 #PBS -N phys_all_probs_stepLen-2
