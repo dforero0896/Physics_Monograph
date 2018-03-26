@@ -12,13 +12,14 @@ iteration = 0
 
 Emin = str(0.0006)
 Emax = str(4.5004)
-Steps_in_energy = str(300)
-distribs = ['unif, two_layer']
+Steps_in_energy = str(100)
+distribs = ['unif', 'two_layer']
 bse_models = ['geoch', 'cosmo', 'geodyn']
 for hpe_dist in distribs:
 	for bse_model in bse_models:
-
-		final_file=open("probability_planet"+hpe_dist+"_"+bse_model+".csv", "w")
+		print "distrib: ", distrib, ", model: ", bse_model
+		filename = "probability_planet_%s_%s.csv"%(hpe_dist,bse_model)
+		final_file=open(filename, "w")
 		for node in nodes_to_consider:
 		    i_c = node[0]
 		    k_c = node[1]
@@ -34,7 +35,9 @@ for hpe_dist in distribs:
 		    command_w.insert(0,'./prob_weight.o')
 		    command_p.insert(0,'./raw_probs.o')
 		    subprocess.call(command_w)
-		    subprocess.call(command_p)
+		#Run raw probabilities once since it doesn't depend on distribution nor bse model.
+		    if(hpe_dist == distribs[0] and bse_model==bse_models[0]):
+		    	subprocess.call(command_p)
 		    data_W=np.loadtxt('prob_weight.dat', dtype=float)
 		    data_P=np.loadtxt('raw_probs.csv', delimiter=',', dtype=float)
 		    avg_prob=sum(data_W*data_P[:,1])

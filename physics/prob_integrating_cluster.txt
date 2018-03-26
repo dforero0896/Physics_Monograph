@@ -1,25 +1,8 @@
-cp: cannot stat `/hpcfs/home/df.forero10/Tesis/Physics_Monograph/physics/AntineutrinoSpectrum_232Th.knt': No such file or directory
-cp: cannot stat `/hpcfs/home/df.forero10/Tesis/Physics_Monograph/physics/AntineutrinoSpectrum_238U.knt': No such file or directory
-Initializing Coordinates
-Initializing Density
-Initializing Abundances in the Crust
-Initializing Abundances in the Mantle
-gsl: interp.c:83: ERROR: x values must be strictly increasing
-Default GSL error handler invoked.
-Initializing Coordinates
-Initializing Density
-Initializing Abundances in the Crust
-Initializing Abundances in the Mantle
-Initializing Potential (density) paths
-127292640
-['0.0006', '4.5004', '300', 'unif, two_layer', 'geoch', '1', '1']
+distrib: 
 Traceback (most recent call last):
-  File "prob_integrating.py", line 38, in <module>
-    data_W=np.loadtxt('prob_weight.dat', dtype=float)
-  File "/lustre/apps/anaconda/2/lib/python2.7/site-packages/numpy/lib/npyio.py", line 896, in loadtxt
-    fh = iter(open(fname, 'U'))
-IOError: [Errno 2] No such file or directory: 'prob_weight.dat'
-cp: cannot stat `probapility_planet.csv': No such file or directory
+  File "prob_integrating.py", line 20, in <module>
+    print "distrib: ", distrib, ", model: ", bse_model
+NameError: name 'distrib' is not defined
 
 
 (hpcstats) Getting modules

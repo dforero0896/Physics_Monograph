@@ -315,9 +315,9 @@ void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, f
 
 	long double Probabilities[N][3];//Array to save probabilities.
 	//double Probabilities[N];
-	#pragma omp parallel for private(i)
+	#pragma omp parallel for private(i,k)
 	for(i=0;i<N;i++){//For each energy...
-	cout << "using " << omp_get_num_threads() << " cores" << endl;
+//	cout << "using " << omp_get_num_threads() << " cores" << endl;
 	  long double energy=EnergyLins[i];
 	  gsl_matrix *Id =gsl_matrix_alloc(3, 3);
     //A matrix to save the product of operators.

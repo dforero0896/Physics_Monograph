@@ -17,7 +17,7 @@ using namespace std;
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const int PREM_len = 187;
 const int totalNeutrinos=10000000;
-const float path_resolution = 1e-4;
+const float path_resolution = 1e-2;
 const int N = 1000;
 
 
@@ -90,7 +90,7 @@ class Planet{
     void initializeDensity();
     void initializeAbundanceCrust();
     void initializeAbundanceMantle(string key, string bse_model);
-    void initializeFluxes(bool oscillated);
+    void initializeFluxes(bool oscillated, string hpe_dist, string bse_model);
     void initializePaths(bool all, int i, int k);
     void initializeEnergySamples();
     void initializeProbabilities();
