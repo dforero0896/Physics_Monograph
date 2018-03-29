@@ -10,7 +10,7 @@ int main(int argc, char const *argv[]) {
 
   earth->initialize("two_layer", "geodyn");
   cout << "total flux " << earth->totalFlux << endl;
-  /*In File outfile, saves a matrix coresponding to the neutrino flux in each node, according to the parameters introduced.*/
+  /*In File outfile, saves a matrix corresponding to the neutrino flux in each node, according to the parameters introduced.*/
   ofstream outfile;
   outfile.open("earth_simul_plots.csv");
   for(int k=0;k<N;k++){

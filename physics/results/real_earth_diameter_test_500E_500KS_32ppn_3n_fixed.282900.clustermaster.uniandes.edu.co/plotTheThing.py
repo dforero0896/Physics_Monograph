@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 
-probData=np.loadtxt('raw_probs.csv', delimiter=',', dtype=float)
+probData=np.loadtxt('probsTest.csv', delimiter=',', dtype=float)
 def plot(data):
 	probabilities, ax = plt.subplots(2, 2, figsize=(10, 5))
 	ax[0, 0].plot(probData[:,0], probData[:,1])
@@ -42,8 +42,10 @@ print type(p1)
 plt.savefig('probPlot.png', dpi=300)
 
 newfig = plt.figure()
-pathData = np.loadtxt('potentialTest.csv')
-plt.plot(pathData)
+pathData = np.loadtxt('potentialTest.csv', delimiter=',', dtype=float)
+plt.plot(pathData[:,0], pathData[:,1])
+plt.xlabel('$r (km)$', fontsize=15)
+plt.ylabel('$A ( eV)$', fontsize=15)
 plt.gcf()
 #plt.gca().set_yscale('log')
 plt.savefig('potentialPlot.png', dpi=300)

@@ -35,7 +35,7 @@ def normalize(data):
 	data[:,2]/=tot
 	data[:,3]/=tot
 p1=plot(probData)
-normalize(probData)
+#normalize(probData)
 p2=plot(probData)
 #plt.gcf()
 print type(p1)
