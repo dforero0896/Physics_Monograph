@@ -13,6 +13,7 @@ using namespace std;
 #include <omp.h>
 #include "earth_simul.h"
 //Constants
+
 //Mass differences
 
 //Functions
@@ -29,5 +30,5 @@ gsl_matrix_complex scale_complex_matrix(gsl_matrix_complex *to_scale, gsl_comple
 void fill_complex_matrix(gsl_matrix_complex *empty, gsl_complex elem_11, gsl_complex elem_12, gsl_complex elem_13, gsl_complex elem_21, gsl_complex elem_22, gsl_complex elem_23, gsl_complex elem_31, gsl_complex elem_32, gsl_complex elem_33);
 gsl_matrix_complex copy_to_complex_from_complex(gsl_matrix_complex *complex, gsl_matrix_complex *container);
 void calculateOperator(double neutrinoEnergy, double A, double L, gsl_matrix_complex* matrix);
-void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, float E_max);
+void calculateProbabilities(vector<float> path, int N, int Steps, int leap, float E_min, float E_max);
 #endif

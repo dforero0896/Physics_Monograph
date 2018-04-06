@@ -1,0 +1,16 @@
+Building Planet
+Initializing Coordinates
+Initializing Density
+Initializing Abundances in the Crust
+Initializing Abundances in the Mantle
+Initializing Fluxes
+Done
+Initializing Potential (density) paths
+distance -1.7387e-13
+total flux 2.09758
+Initializing Fluxes
+total oscillated flux 0
+total oscillated Th flux 0
+total oscillated U flux 0
+integral over whole Earth 3170.48
+fraction of Earth 0.497642

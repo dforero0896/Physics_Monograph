@@ -388,7 +388,7 @@ float density_to_potential(float dty, bool antineutrino){
               vector<float> path;
               float path_len = get_r(R_earth-z,x );
               asArray[i][k].distanceToDetector=path_len;
-              float element_num = roundf(path_len/path_resolution);
+              float element_num = roundf(path_len/(e_leap*path_resolution));
               asArray[i][k].pathLen=element_num;
               path.reserve(int(element_num));
               vector<float> times;
@@ -413,7 +413,7 @@ float density_to_potential(float dty, bool antineutrino){
             vector<float> path;
             float path_len = get_r(R_earth-z,x );
             asArray[i][k].distanceToDetector=path_len;
-            float element_num = roundf(path_len/path_resolution);
+            float element_num = roundf(path_len/(e_leap*path_resolution));
             asArray[i][k].pathLen=element_num;
             path.reserve(int(element_num));
             vector<float> times;

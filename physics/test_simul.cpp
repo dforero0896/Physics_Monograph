@@ -7,10 +7,13 @@ g++ -fopenmp -o test_simul.o earth_simul.cpp test_simul.cpp `gsl-config --cflags
 using namespace std;
 
 int main(int argc, char const *argv[]) {
+  int t_i=1;int t_k = 990;
   Planet *earth = new Planet();
   earth->Planet::initialize("unif", "geoch");
-  earth->Planet::initializePaths(0,2,1);
-  cout << "distance " << earth->asArray[2][1].path[100000000] << endl;
+  earth->Planet::initializePaths(0,t_i,t_k);
+  //cout << "distance " << earth->asArray[t_i][t_k].path[1] << endl;
+  cout << "dstance to detector " << earth->asArray[t_i][t_k].distanceToDetector << endl;
+  cout << "path len " << earth->asArray[t_i][t_k].pathLen << endl;
   cout << "total flux " << earth->totalFlux << endl;
   //cout << "crust mass " << earth->crustMass << endl;
   //cout << "mantle mass " << earth->mantleMass << endl;

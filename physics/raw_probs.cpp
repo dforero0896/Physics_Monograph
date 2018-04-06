@@ -3,6 +3,7 @@ g++ -fopenmp -o raw_probs.o uandino.cpp earth_simul.cpp raw_probs.cpp `gsl-confi
 */
 
 #include "uandino.h"
+#include "earth_simul.h"
 //This program expects Emin, Emax, Steps_in_energy, dist, bse_model, i, k, run_num
 
 int main(int argc, char const *argv[]) {
@@ -37,11 +38,11 @@ int main(int argc, char const *argv[]) {
   earth->Planet::initializeAbundanceMantle(dist, bse_model);
   earth->Planet::initializePaths(0, i, k);
   int path_len = int(earth->asArray[i][k].pathLen);
-  cout << path_len << endl;
+  cout << "path elements " << path_len << endl;
 
-  calculateProbabilities(earth->asArray[i][k].path, Steps, path_len, E_min, E_max );
+  calculateProbabilities(earth->asArray[i][k].path, Steps, path_len, e_leap, E_min, E_max );
 
-  
+
 
   return 0;
 }
