@@ -10,12 +10,12 @@ import os
 nodes_to_consider = np.loadtxt('planet_coords.csv', delimiter=' ', dtype=int)
 iteration = 0
 
-Emin = str(0.001)
+Emin = str(0.01)
 Emax = str(4.5004)
 Steps_in_energy = str(100)
-distribs = ['unif', 'two_layer']
-#bse_models = ['geoch', 'cosmo', 'geodyn']
-bse_models=['geodyn']
+#distribs = ['unif', 'two_layer']
+distribs = ['two_layer']
+bse_models = ['geoch', 'cosmo', 'geodyn']
 for hpe_dist in distribs:
 	for bse_model in bse_models:
 		print "distrib: ", hpe_dist, ", model: ", bse_model
