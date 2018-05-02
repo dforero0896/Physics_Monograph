@@ -337,7 +337,7 @@ float density_to_potential(float dty, bool antineutrino){
           prob_matrix[n][m]=0;
         }
       }
-      import_probability("probability_planet"+hpe_dist+"_"+bse_model+".csv", prob_matrix);
+      import_probability("probability_planet_"+hpe_dist+"_"+bse_model+".csv", prob_matrix);
       for(int i=0;i<N/2;i++){
         for(int k=0;k<N;k++){
           float prob =1.;
@@ -346,7 +346,7 @@ float density_to_potential(float dty, bool antineutrino){
             asArray[i][k].meanSurvProb=prob;
             //cout << prob << " , " << i << " , "<< k << endl;
           }
-          if(asArray[i][k].isMantle){//flux from mantle and crust
+          if(asArray[i][k].isSE){//flux from mantle and crust
             asArray[i][k].neutrinoUFlux=prob*(6.)*(asArray[i][k].abundanceU*1e-9)*(0.9927)*(4.916*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(238.051*1.661e-27);
             asArray[i][k].neutrinoThFlux=prob*(4.)*(asArray[i][k].abundanceTh*1e-9)*(1.)*(1.563*1e-18*1e-6)*(asArray[i][k].massDensity*1e-3)*asArray[i][k].volume*asArray[i][k].solidAngle*1e5/(232.038*1.661e-27);
             asArray[i][k].neutrinoFlux=asArray[i][k].neutrinoUFlux+asArray[i][k].neutrinoThFlux;
