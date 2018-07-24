@@ -17,7 +17,8 @@ using namespace std;
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const int PREM_len = 187;
 const int totalNeutrinos=10000000;
-const float path_resolution = 1e-2;
+const float path_resolution = 1e-5;
+const int e_leap = 1000000;
 const int N = 1000;
 
 

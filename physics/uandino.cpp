@@ -288,7 +288,7 @@ void calculateOperator(double neutrinoEnergy, double A, double L, gsl_matrix_com
   gsl_matrix_free(T_flav_mat);
   gsl_matrix_free(T_sq_flav_mat);
 }
-void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, float E_max){
+void calculateProbabilities(vector<float> path, int N, int Steps, int leap, float E_min, float E_max){
   /*Writes a file with energies and all three probabilities*/
 
   double theta1 = 0.7222;
@@ -312,7 +312,7 @@ void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, f
   vector<float> EnergyLins = linspace(E_min*1e6, E_max*1e6, N);
 	//omp_set_num_threads(4);//Number of threads to use.
 	int i,k;
-
+	int lim = int(log(leap)/log(2.));
 	long double Probabilities[N][3];//Array to save probabilities.
 	//double Probabilities[N];
 	#pragma omp parallel for private(i,k)
@@ -334,6 +334,20 @@ void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, f
       //A matrix to store the operator for this step.
 	    gsl_matrix_complex *iter_operator = gsl_matrix_complex_alloc(3,3);
 	    calculateOperator(energy, density, longitude_units_conversion(path_resolution),iter_operator);
+      int n;
+      for(n=0;n<lim;n++){
+        gsl_matrix_complex *operator_n = gsl_matrix_complex_alloc(3,3);
+        //Copy this iteration's operator.
+        copy_to_complex_from_complex(iter_operator, operator_n);
+        gsl_matrix_complex *operator_nn = gsl_matrix_complex_alloc(3,3);
+        //Copy this iteration's operator a second time.
+        copy_to_complex_from_complex(iter_operator, operator_nn);
+        //Multiply the operator for this step by itself 'leap' times.
+        gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, gsl_complex_rect(1., 0), operator_nn, operator_n, gsl_complex_rect(0., 0.),iter_operator);
+
+        gsl_matrix_complex_free(operator_n);
+        gsl_matrix_complex_free(operator_nn);
+      }
 	    gsl_matrix_complex *operator_product_copy = gsl_matrix_complex_alloc(3,3);
       //Copy operator product so far.
 	    copy_to_complex_from_complex(operator_product, operator_product_copy);
@@ -352,6 +366,10 @@ void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, f
 		Probabilities[i][0] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 0,0));
 		Probabilities[i][1] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 1,0));
 		Probabilities[i][2] = gsl_complex_abs2(gsl_matrix_complex_get(operator_product, 2,0));
+		float tot = Probabilities[i][0] +Probabilities[i][1] + Probabilities[i][2];
+		Probabilities[i][0]/=tot;
+		Probabilities[i][1]/=tot;
+		Probabilities[i][2]/=tot;
 		//cout << EnergyLins[i] << "," << Probabilities[i][0] << "," << Probabilities[i][1] << "," << Probabilities[i][2] << endl;
     gsl_matrix_complex_free(operator_product);
 
@@ -368,7 +386,7 @@ void calculateProbabilities(vector<float> path, int N, int Steps, float E_min, f
   myfile.close();
   ofstream potentialfile;
   potentialfile.open("potentialTest.csv");
-  for(k=0;k<Steps;k+=1000){
+  for(k=0;k<Steps;k++){
     //coord = coord_init + k*step_len;
     potentialfile << path[k] << endl;
   }

@@ -5,14 +5,14 @@
 # the options
 # First we need to stablish the name of the queue we will utilize.
 # For example if we need 8 intel processors and 64GB or RAM for one week in one node.
-#PBS -l nodes=4:ppn=32
+#PBS -l nodes=3:ppn=32
 #PBS -l mem=128gb
-#PBS -l walltime=00:99:00:00
+#PBS -l walltime=99:99:00:00
 #PBS -M df.forero10@uniandes.edu.co
 #PBS -m abe
-#PBS -N phys_all_probs_stepLen-2
+#PBS -N bigRun_two_layer_geodyn
 #PBS -j oe
-#PBS -o prob_integrating_cluster.txt
+#PBS -o out_$PBS_JOBNAME.txt
 
 # Create a temporary directory locally on the node optimizes I/O performance
 TEMP_DIR=/state/partition1/$USER/$PBS_JOBNAME.$PBS_JOBID
@@ -52,4 +52,3 @@ cp probability_planet* $OUT_DIR
 
 cd $OUT_DIR
 mv -f $TEMP_DIR ./
-

@@ -10,11 +10,13 @@ import os
 nodes_to_consider = np.loadtxt('planet_coords.csv', delimiter=' ', dtype=int)
 iteration = 0
 
-Emin = str(0.001)
+Emin = str(0.01)
 Emax = str(4.5004)
 Steps_in_energy = str(100)
-distribs = ['unif', 'two_layer']
-bse_models = ['geoch', 'cosmo', 'geodyn']
+#distribs = ['unif', 'two_layer']
+distribs = ['two_layer']
+#bse_models = ['geoch', 'cosmo', 'geodyn']
+bse_models = ['geodyn']
 for hpe_dist in distribs:
 	for bse_model in bse_models:
 		print "distrib: ", hpe_dist, ", model: ", bse_model
@@ -40,10 +42,12 @@ for hpe_dist in distribs:
 				subprocess.call(command_p)
 			data_W=np.loadtxt('prob_weight.dat', dtype=float)
 			data_P=np.loadtxt('raw_probs.csv', delimiter=',', dtype=float)
+
 			data_Pee = data_P[:,1]
 			avg = np.average(data_Pee[np.logical_not(np.isnan(data_Pee))])
 			for nan in np.argwhere(np.isnan(data_Pee)):
 				data_Pee[nan]= avg
+
 			avg_prob=sum(data_W*data_P[:,1])
 			print avg_prob
 			final_file.write("%i %i %f\n"%(i_c, k_c, avg_prob))

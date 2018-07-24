@@ -18,7 +18,7 @@ ax[1].set_xscale('log')
 fig.tight_layout()
 plt.gcf()
 plt.savefig('test_path_fig.png', dpi=500)
-'''
+
 
 
 probData=np.loadtxt('probsTest.csv', delimiter=',', dtype=float)
@@ -54,6 +54,7 @@ plt.gcf()
 plt.savefig('document/probComp.png', dpi=500)
 
 '''
+'''
 energyData=np.loadtxt('energy_repo_238U.knt', dtype=float)
 energyData2=np.loadtxt('energy_repo_232Th.knt', dtype=float)
 enerfig=plt.figure(figsize=(15, 10))
@@ -68,7 +69,7 @@ ax.set_yscale('log')
 plt.gcf()
 plt.savefig('allowed_energies_hist.png', dpi=500)
 '''
-'''
+
 earth_model=np.loadtxt('earth_simul_plots.csv', delimiter=',', dtype=float)
 earthplot=plt.figure(figsize=(12, 15))
 plt.imshow(earth_model, interpolation="None")
@@ -84,4 +85,4 @@ cb.ax.set_title('Radius ($km$)', fontsize=25)
 ax.invert_yaxis()
 plt.gcf()
 plt.savefig('earth_test.png', transparecy=True, dpi=500)
-'''
+

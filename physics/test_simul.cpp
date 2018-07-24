@@ -7,14 +7,19 @@ g++ -fopenmp -o test_simul.o earth_simul.cpp test_simul.cpp `gsl-config --cflags
 using namespace std;
 
 int main(int argc, char const *argv[]) {
+  int t_i=1;int t_k = 990;
   Planet *earth = new Planet();
-  earth->Planet::initialize("unif", "geoch");
-  earth->Planet::initializePaths(0,2,1);
-  cout << "distance " << earth->asArray[2][1].path[100000000] << endl;
+  string hpe_dist = "unif";
+  string bse_model = "geoch";
+  earth->Planet::initialize(hpe_dist, bse_model);
+  earth->Planet::initializePaths(0,t_i,t_k);
+  //cout << "distance " << earth->asArray[t_i][t_k].path[1] << endl;
+  cout << "dstance to detector " << earth->asArray[t_i][t_k].distanceToDetector << endl;
+  cout << "path len " << earth->asArray[t_i][t_k].pathLen << endl;
   cout << "total flux " << earth->totalFlux << endl;
   //cout << "crust mass " << earth->crustMass << endl;
   //cout << "mantle mass " << earth->mantleMass << endl;
-  earth->Planet::initializeFluxes(1, "two_layer", "geodyn");
+  earth->Planet::initializeFluxes(1, hpe_dist, bse_model);
   cout << "total oscillated flux " << earth->totalFlux << endl;
   cout << "total oscillated Th flux " << earth->totalThFlux << endl;
   cout << "total oscillated U flux " << earth->totalUFlux << endl;
@@ -22,7 +27,8 @@ int main(int argc, char const *argv[]) {
   outfile.open("earth_simul_plots.csv");
   for(int k=0;k<N;k++){
     for(int i =0 ; i<N/2;i++){
-      outfile << earth->asArray[i][k].isEarth*earth->asArray[i][k].abundanceU << ',' ;
+      float TFlux = earth->asArray[i][k].neutrinoThFlux + earth->asArray[i][k].neutrinoUFlux;
+      outfile << earth->asArray[i][k].isEarth*earth->asArray[i][k].neutrinoUFlux << ',' ;
       }
       outfile <<0<< endl;
     }
